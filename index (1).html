@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>APEX Coaching Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+--bg:#08080C;--bg1:#0E0E14;--bg2:#14141C;--bg3:#1A1A24;--bg4:#22222E;
+--bd:#2A2A38;--bd2:#3A3A4A;
+--t1:#F0EEF6;--t2:#B0AEBC;--t3:#78768A;--t4:#55536A;
+--ac:#C8A2FF;--ac2:#9B6FE0;--ac3:rgba(200,162,255,.12);
+--em:#6EE7B7;--em2:rgba(110,231,183,.12);
+--gd:#F5D76E;--gd2:rgba(245,215,110,.12);
+--rs:#FB7185;--rs2:rgba(251,113,133,.12);
+--bl:#60A5FA;--bl2:rgba(96,165,250,.12);
+--cr:#FB923C;--cr2:rgba(251,146,60,.12);
+--fd:'Playfair Display',serif;--fb:'DM Sans',sans-serif;--fm:'IBM Plex Mono',monospace;
+--r:14px;--r2:10px;--r3:6px;
+}
+html{scroll-behavior:smooth}
+body{font-family:var(--fb);background:var(--bg);color:var(--t1);min-height:100vh}
+
+/* LOGIN */
+.login-screen{position:fixed;inset:0;z-index:999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:background .3s}
+.login-screen.hidden{display:none}
+.login-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:48px;max-width:440px;width:90%;text-align:center}
+.login-card h1{font-family:var(--fd);font-size:36px;font-weight:500;margin-bottom:4px}
+.login-card h1 span{color:var(--ac)}
+.login-card .sub{color:var(--t3);font-size:13px;margin-bottom:32px}
+.login-input{width:100%;padding:13px 16px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);
+color:var(--t1);font-family:var(--fb);font-size:14px;outline:none;margin-bottom:10px;transition:border-color .2s}
+.login-input:focus{border-color:var(--ac)}
+.login-btn{width:100%;padding:13px;background:var(--ac);color:var(--bg);border:none;border-radius:var(--r2);
+font-family:var(--fb);font-size:14px;font-weight:600;cursor:pointer;transition:background .2s}
+.login-btn:hover{background:var(--ac2)}
+.login-divider{display:flex;align-items:center;gap:14px;margin:20px 0;color:var(--t4);font-size:11px}
+.login-divider::before,.login-divider::after{content:'';flex:1;height:1px;background:var(--bd)}
+.login-ghost{width:100%;padding:11px;background:transparent;border:1px solid var(--bd);border-radius:var(--r2);
+color:var(--t2);font-family:var(--fb);font-size:13px;cursor:pointer;transition:all .2s}
+.login-ghost:hover{border-color:var(--ac);color:var(--ac)}
+
+/* LAYOUT */
+.app{display:flex;min-height:100vh}
+.app.hidden{display:none}
+.sidebar{width:250px;min-height:100vh;background:var(--bg1);border-right:1px solid var(--bd);
+position:fixed;left:0;top:0;bottom:0;z-index:50;display:flex;flex-direction:column;overflow-y:auto}
+.sidebar-top{padding:20px 18px 16px;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between}
+.sidebar-top h1{font-family:var(--fd);font-size:20px;font-weight:600}
+.sidebar-top h1 span{color:var(--ac)}
+.sidebar-top .logout{background:none;border:none;color:var(--t4);cursor:pointer;font-size:16px;transition:color .2s}
+.sidebar-top .logout:hover{color:var(--rs)}
+.sidebar-user{padding:14px 18px;border-bottom:1px solid var(--bd);display:flex;align-items:center;gap:10px}
+.sidebar-avatar{width:32px;height:32px;border-radius:50%;background:var(--ac3);border:2px solid var(--ac);
+display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ac);flex-shrink:0}
+.sidebar-uname{font-size:12px;font-weight:600}.sidebar-urole{font-size:10px;color:var(--t4)}
+.nav-sec{font-size:9px;font-weight:700;color:var(--t4);text-transform:uppercase;letter-spacing:.14em;padding:16px 18px 4px}
+.nav-i{display:flex;align-items:center;gap:9px;padding:9px 18px;cursor:pointer;transition:all .15s;
+font-size:12.5px;color:var(--t2);border-left:3px solid transparent}
+.nav-i:hover{background:var(--bg3);color:var(--t1)}
+.nav-i.active{background:var(--ac3);color:var(--ac);border-left-color:var(--ac)}
+.nav-i .ic{width:18px;text-align:center;font-size:13px}
+.nav-i .badge{margin-left:auto;font-family:var(--fm);font-size:9px;padding:1px 6px;border-radius:99px;background:var(--bg3);color:var(--t4)}
+.main{margin-left:250px;flex:1}
+.pg{display:none;animation:fadeIn .35s}.pg.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pg-h{padding:28px 36px 20px;border-bottom:1px solid var(--bd)}
+.pg-h h2{font-family:var(--fd);font-size:24px;font-weight:500}
+.pg-h p{color:var(--t3);font-size:13px;margin-top:3px}
+.pg-b{padding:28px 36px 40px}
+
+/* CARDS */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.cd{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;position:relative;overflow:hidden;transition:all .2s}
+.cd:hover{border-color:var(--bd2)}.cd::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.cd.ac::before{background:var(--ac)}.cd.em::before{background:var(--em)}
+.cd.gd::before{background:var(--gd)}.cd.rs::before{background:var(--rs)}.cd.bl::before{background:var(--bl)}
+.cd-t{font-size:11px;color:var(--t3);margin-bottom:4px}.cd-v{font-family:var(--fm);font-size:26px;font-weight:600}
+.cd.ac .cd-v{color:var(--ac)}.cd.em .cd-v{color:var(--em)}.cd.gd .cd-v{color:var(--gd)}.cd.rs .cd-v{color:var(--rs)}.cd.bl .cd-v{color:var(--bl)}
+.cd-s{font-size:10px;color:var(--t4);margin-top:2px}
+
+/* INPUTS */
+.irow{display:flex;gap:8px;margin-bottom:14px}
+.irow input,.irow select,.irow textarea{flex:1;padding:10px 13px;background:var(--bg3);border:1px solid var(--bd);
+border-radius:var(--r2);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;transition:border-color .2s}
+.irow input:focus,.irow textarea:focus{border-color:var(--ac)}
+.irow input::placeholder,.irow textarea::placeholder{color:var(--t4)}
+.btn{padding:9px 18px;border-radius:var(--r2);font-family:var(--fb);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);transition:all .2s}
+.btn-a{background:var(--ac);color:var(--bg);border-color:var(--ac)}.btn-a:hover{background:var(--ac2)}
+.btn-g{background:transparent;color:var(--t2)}.btn-g:hover{background:var(--bg3)}
+
+/* TRACKER */
+.tk{display:flex;flex-direction:column;gap:5px}
+.tk-i{display:flex;align-items:center;gap:10px;padding:11px 14px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);transition:all .15s}
+.tk-i:hover{border-color:var(--bd2)}
+.tk-c{width:20px;height:20px;border-radius:var(--r3);border:2px solid var(--bd);cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tk-c.done{background:var(--em);border-color:var(--em)}.tk-c.done::after{content:'✓';color:var(--bg);font-size:11px;font-weight:700}
+.tk-t{flex:1;font-size:12.5px}.tk-t.dn{text-decoration:line-through;color:var(--t4)}
+.tk-m{font-family:var(--fm);font-size:10px;color:var(--t4)}
+.tk-x{width:22px;height:22px;border-radius:50%;background:transparent;border:none;color:var(--t4);cursor:pointer;font-size:13px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tk-x:hover{background:var(--rs2);color:var(--rs)}
+
+/* TIMER */
+.tmr{text-align:center;padding:32px 0}
+.tmr-c{width:180px;height:180px;border-radius:50%;border:4px solid var(--bd);margin:0 auto 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:border-color .3s}
+.tmr-c.on{border-color:var(--em)}.tmr-c.ps{border-color:var(--gd)}
+.tmr-t{font-family:var(--fm);font-size:44px;font-weight:600}.tmr-l{font-size:11px;color:var(--t3);margin-top:3px}
+.tmr-btns{display:flex;gap:10px;justify-content:center;margin-top:14px}
+.tmr-b{width:44px;height:44px;border-radius:50%;border:2px solid var(--bd);background:var(--bg2);color:var(--t1);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.tmr-b:hover{border-color:var(--ac);background:var(--ac3)}
+.presets{display:flex;gap:6px;justify-content:center;margin-top:14px}
+.pre{padding:5px 12px;border-radius:99px;background:var(--bg3);border:1px solid var(--bd);color:var(--t3);font-size:10px;font-family:var(--fm);cursor:pointer;transition:all .2s}
+.pre:hover,.pre.on{border-color:var(--ac);color:var(--ac);background:var(--ac3)}
+
+/* JOURNAL */
+.je{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:10px}
+.je-d{font-family:var(--fm);font-size:10px;color:var(--t4);margin-bottom:6px}
+.je-t{font-size:12.5px;line-height:1.6;color:var(--t2)}
+textarea.jta{width:100%;min-height:90px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);padding:12px;color:var(--t1);font-family:var(--fb);font-size:13px;line-height:1.6;outline:none;resize:vertical;transition:border-color .2s}
+textarea.jta:focus{border-color:var(--ac)}textarea.jta::placeholder{color:var(--t4)}
+
+/* PROGRESS */
+.pr{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.pr-l{font-size:11px;width:130px;color:var(--t2)}.pr-tr{flex:1;height:7px;background:var(--bg3);border-radius:99px;overflow:hidden}
+.pr-f{height:100%;border-radius:99px;transition:width .5s}.pr-p{font-family:var(--fm);font-size:11px;color:var(--t4);width:36px;text-align:right}
+
+/* PRINCIPLES */
+.prc{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:8px;border-left:4px solid var(--gd)}
+.prc-t{font-weight:600;font-size:13px;margin-bottom:3px}.prc-d{font-size:10px;color:var(--t4);margin-bottom:4px}
+.prc-b{font-size:12px;color:var(--t2);line-height:1.6}
+
+/* ADMIN CLIENT LIST */
+.cl-r{display:grid;grid-template-columns:36px 1fr 120px 80px 100px 70px;align-items:center;gap:12px;padding:13px 16px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);margin-bottom:6px;transition:all .15s}
+.cl-r:hover{border-color:var(--bd2)}
+.cl-av{width:32px;height:32px;border-radius:50%;background:var(--ac3);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--ac)}
+.cl-n{font-weight:600;font-size:13px}.cl-c{font-family:var(--fm);font-size:10px;color:var(--t4)}
+.cl-s{font-family:var(--fm);font-size:12px;color:var(--em)}.cl-d{font-size:11px;color:var(--t4)}
+.cpb{padding:5px 10px;border-radius:99px;background:var(--ac3);border:1px solid rgba(200,162,255,.2);color:var(--ac);font-family:var(--fb);font-size:10px;cursor:pointer;transition:all .2s}
+.cpb:hover{background:rgba(200,162,255,.25)}
+
+/* VISION CARDS */
+.vis-g{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.vis-c{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;position:relative;overflow:hidden}
+.vis-c::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.vis-c:nth-child(1)::before{background:var(--ac)}.vis-c:nth-child(2)::before{background:var(--em)}
+.vis-c:nth-child(3)::before{background:var(--gd)}.vis-c:nth-child(4)::before{background:var(--rs)}
+.vis-c .per{font-family:var(--fm);font-size:10px;color:var(--t4);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px}
+.vis-c textarea{width:100%;min-height:100px;background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:13px;line-height:1.6;resize:vertical;outline:none}
+
+/* SPHERES */
+.sph{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:10px;overflow:hidden}
+.sph-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer}
+.sph-hl{display:flex;align-items:center;gap:10px}
+.sph-ic{width:32px;height:32px;border-radius:var(--r2);display:flex;align-items:center;justify-content:center;font-size:15px}
+.sph-t{font-size:13px;font-weight:600}.sph-st{font-size:10px;color:var(--t4)}
+.sph-tog{color:var(--t4);font-size:11px;transition:transform .3s}.sph.open .sph-tog{transform:rotate(180deg)}
+.sph-b{display:none;padding:0 18px 18px}.sph.open .sph-b{display:block}
+.mg{display:grid;grid-template-columns:repeat(12,1fr);gap:4px;margin-top:10px}
+.mc{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);padding:6px 4px;text-align:center}
+.mc .mn{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);margin-bottom:3px}
+.mc textarea{width:100%;min-height:36px;background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:9px;line-height:1.3;resize:none;outline:none;text-align:center}
+
+/* HEALTH */
+.hg{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+
+/* DECOMP MODULE */
+.dec-sphere{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);margin-bottom:14px;overflow:hidden}
+.dec-sphere-h{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;border-bottom:1px solid transparent;transition:all .2s}
+.dec-sphere.open .dec-sphere-h{border-bottom-color:var(--bd)}
+.dec-sphere-h:hover{background:var(--bg3)}
+.dec-sphere-left{display:flex;align-items:center;gap:12px}
+.dec-sphere-name{font-size:14px;font-weight:600}
+.dec-sphere-goal{font-size:11px;color:var(--t3);max-width:400px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dec-sphere-arrow{color:var(--t4);font-size:11px;transition:transform .3s}
+.dec-sphere.open .dec-sphere-arrow{transform:rotate(180deg)}
+.dec-sphere-body{display:none;padding:0}
+.dec-sphere.open .dec-sphere-body{display:block}
+
+.dec-year-row{display:flex;align-items:center;gap:12px;padding:14px 18px;background:var(--bg3);border-bottom:1px solid var(--bd)}
+.dec-year-row label{font-size:11px;font-weight:600;color:var(--ac);white-space:nowrap;min-width:120px}
+.dec-year-row input{flex:1;padding:8px 12px;background:var(--bg);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none;transition:border-color .2s}
+.dec-year-row input:focus{border-color:var(--ac)}
+
+.dec-months{display:flex;overflow-x:auto;border-bottom:1px solid var(--bd)}
+.dec-month{min-width:160px;flex:1;border-right:1px solid var(--bd)}
+.dec-month:last-child{border-right:none}
+.dec-month-h{padding:8px 12px;background:var(--bg3);text-align:center;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--t3);border-bottom:1px solid var(--bd);position:sticky;top:0;cursor:pointer}
+.dec-month-h:hover{color:var(--ac)}
+.dec-month-h.active{color:var(--ac);background:var(--ac3)}
+
+.dec-month-goal{padding:8px 10px;border-bottom:1px solid rgba(42,42,56,.5)}
+.dec-month-goal input{width:100%;padding:6px 8px;background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--gd);font-family:var(--fb);font-size:12px;font-weight:600;outline:none;transition:border-color .2s}
+.dec-month-goal input:focus{border-color:var(--gd);border-style:solid}
+.dec-month-goal input::placeholder{color:var(--t4);font-weight:400}
+
+.dec-tasks-area{padding:6px 8px}
+.dec-sprint-label{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--t4);padding:6px 4px 3px;display:flex;align-items:center;gap:6px}
+.dec-sprint-label::after{content:'';flex:1;height:1px;background:var(--bd)}
+.dec-task{display:flex;align-items:center;gap:6px;padding:4px 4px;border-radius:var(--r3);transition:background .15s}
+.dec-task:hover{background:rgba(255,255,255,.03)}
+.dec-task-check{width:16px;height:16px;border-radius:3px;border:1.5px solid var(--bd);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .2s;font-size:9px}
+.dec-task-check.done{background:var(--em);border-color:var(--em)}
+.dec-task-check.done::after{content:'✓';color:var(--bg);font-weight:700}
+.dec-task-text{flex:1;font-size:11px;color:var(--t2)}
+.dec-task-text.done{text-decoration:line-through;color:var(--t4)}
+.dec-task-cal{width:20px;height:20px;border-radius:3px;border:none;background:transparent;color:var(--t4);cursor:pointer;font-size:12px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.dec-task-cal:hover{background:var(--bl2);color:var(--bl)}
+.dec-task-rm{width:16px;height:16px;border-radius:50%;border:none;background:transparent;color:var(--t4);cursor:pointer;font-size:11px;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.dec-task-rm:hover{color:var(--rs)}
+.dec-add-task{display:flex;align-items:center;gap:4px;padding:3px 4px;cursor:pointer;color:var(--t4);font-size:10px;transition:color .2s;margin-top:2px}
+.dec-add-task:hover{color:var(--ac)}
+
+.dec-month-expanded{padding:18px;background:var(--bg1)}
+.dec-expanded-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.dec-expanded-title{font-family:var(--fd);font-size:18px}
+.dec-close-expanded{background:none;border:none;color:var(--t3);cursor:pointer;font-size:18px}
+.dec-sprints-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.dec-sprint-col{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);overflow:hidden}
+.dec-sprint-col-h{padding:8px 10px;background:var(--bg3);border-bottom:1px solid var(--bd);font-size:10px;font-weight:700;text-align:center;text-transform:uppercase;letter-spacing:.08em}
+.dec-sprint-col-h.s1{color:var(--ac)}.dec-sprint-col-h.s2{color:var(--em)}.dec-sprint-col-h.s3{color:var(--gd)}.dec-sprint-col-h.s4{color:var(--rs)}
+.dec-sprint-col-body{padding:8px;min-height:120px}
+
+.dec-gcal-btn{display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border-radius:99px;background:var(--bl2);border:1px solid rgba(96,165,250,.3);color:var(--bl);font-family:var(--fb);font-size:11px;font-weight:600;cursor:pointer;transition:all .2s;margin-top:12px}
+.dec-gcal-btn:hover{background:rgba(96,165,250,.2)}
+.hi{display:flex;align-items:center;gap:10px;padding:12px 14px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);cursor:pointer;transition:all .15s;user-select:none}
+.hi:hover{border-color:var(--bd2)}
+.hc{width:20px;height:20px;border-radius:var(--r3);border:2px solid var(--bd);display:flex;align-items:center;justify-content:center;transition:all .2s;flex-shrink:0}
+.hi.yes .hc{background:var(--em);border-color:var(--em)}.hi.yes .hc::after{content:'✓';color:var(--bg);font-size:11px;font-weight:700}
+.hi.no .hc{background:var(--rs2);border-color:var(--rs)}.hi.no .hc::after{content:'✗';color:var(--rs);font-size:11px;font-weight:700}
+.hl{font-size:12px}
+
+/* SAVE INDICATOR */
+.svi{position:fixed;bottom:16px;right:16px;z-index:200;padding:8px 16px;border-radius:99px;font-size:12px;font-weight:500;opacity:0;transition:all .3s;pointer-events:none}
+.svi.saving{opacity:1;background:var(--ac3);border:1px solid rgba(200,162,255,.3);color:var(--ac)}
+.svi.saved{opacity:1;background:var(--em2);border:1px solid var(--em);color:var(--em)}
+
+/* TOAST */
+.toast{position:fixed;top:70px;right:16px;z-index:300;padding:10px 18px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--em);color:var(--em);font-size:12px;animation:tin .3s,tout .3s 2.5s forwards}
+@keyframes tin{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tout{from{opacity:1}to{opacity:0;transform:translateX(16px)}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;bottom:0;transform:translateX(-100%);z-index:100;transition:transform .3s}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .g2,.g3,.g4{grid-template-columns:1fr}.vis-g{grid-template-columns:1fr 1fr}.mg{grid-template-columns:repeat(6,1fr)}.hg{grid-template-columns:1fr}
+  .cl-r{grid-template-columns:1fr 1fr}
+  .pg-b{padding:20px 16px}.pg-h{padding:20px 16px}
+  .mobile-bar{display:flex!important}
+}
+.mobile-bar{display:none;position:fixed;top:0;left:0;right:0;z-index:90;height:52px;background:var(--bg1);border-bottom:1px solid var(--bd);align-items:center;padding:0 14px;gap:10px}
+.mobile-bar button{background:none;border:none;color:var(--t1);font-size:22px;cursor:pointer}
+.mobile-bar .mb-title{font-family:var(--fd);font-size:16px;font-weight:600}
+.mobile-bar .mb-title span{color:var(--ac)}
+.mobile-bar .mb-theme{margin-left:auto}
+@media(max-width:900px){.main{padding-top:52px}}
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:99}
+.overlay.show{display:block}
+
+/* LIGHT THEME */
+body.light{--bg:#F8F7FC;--bg1:#FFFFFF;--bg2:#F0EFF5;--bg3:#E8E7F0;--bg4:#DDDCE8;
+--bd:#D0CFE0;--bd2:#B8B7C8;--t1:#1A1A2E;--t2:#3A3A50;--t3:#6A6A80;--t4:#9090A8;
+--ac:#8B5CF6;--ac2:#7C3AED;--ac3:rgba(139,92,246,.1);
+--em:#059669;--em2:rgba(5,150,105,.1);--gd:#D97706;--gd2:rgba(217,119,6,.1);
+--rs:#E11D48;--rs2:rgba(225,29,72,.1);--bl:#2563EB;--bl2:rgba(37,99,235,.1);--cr:#EA580C;--cr2:rgba(234,88,12,.1)}
+
+/* SESSION TABLE */
+.sess-tbl{width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;font-size:12px}
+.sess-tbl th{padding:10px 8px;background:var(--bg3);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--t4);border-bottom:1px solid var(--bd);text-align:left;white-space:nowrap}
+.sess-tbl td{padding:6px 8px;border-bottom:1px solid rgba(42,42,56,.3);background:var(--bg2);vertical-align:top}
+.sess-tbl tr:last-child td{border-bottom:none}
+.sess-tbl .phase-row td{background:var(--bg3);padding:10px 12px;font-family:var(--fd);font-size:14px;font-weight:600;color:var(--gd)}
+.sess-tbl input,.sess-tbl textarea{width:100%;background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:11px;outline:none;resize:none;line-height:1.4}
+.sess-tbl input::placeholder,.sess-tbl textarea::placeholder{color:var(--t4)}
+.sess-tbl textarea{min-height:32px}
+.sess-tbl .sn{font-family:var(--fm);font-size:11px;color:var(--t4);text-align:center;width:30px}
+.sess-tbl .sc{width:30px;text-align:center}
+.sess-done-check{width:18px;height:18px;border-radius:3px;border:2px solid var(--bd);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all .2s}
+.sess-done-check.done{background:var(--em);border-color:var(--em)}
+.sess-done-check.done::after{content:'✓';color:var(--bg);font-size:10px;font-weight:700}
+.sess-tbl tr.row-done td{opacity:.45}
+.sess-tbl tr.row-done .sess-topic{text-decoration:line-through}
+
+/* TARIFF CARDS */
+.tariff-card{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:22px;position:relative;overflow:hidden;transition:all .25s}
+.tariff-card:hover{border-color:var(--ac);transform:translateY(-2px)}
+.tariff-card.popular{border-color:var(--ac)}
+.tariff-card.popular::before{content:'ХИТ';position:absolute;top:12px;right:12px;font-size:9px;font-weight:700;padding:3px 8px;border-radius:99px;background:var(--ac);color:var(--bg);letter-spacing:.06em}
+.tariff-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.tariff-price{font-family:var(--fm);font-size:24px;font-weight:700;color:var(--ac);margin-bottom:4px}
+.tariff-meta{font-size:11px;color:var(--t3);margin-bottom:12px;line-height:1.5}
+.tariff-desc{font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:14px}
+.tariff-btn{width:100%;padding:10px;border-radius:var(--r2);font-family:var(--fb);font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--ac);background:var(--ac3);color:var(--ac);transition:all .2s}
+.tariff-btn:hover{background:var(--ac);color:var(--bg)}
+::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--bd);border-radius:3px}
+</style>
+</head>
+<body>
+<div class="svi" id="svi"></div>
+<div class="overlay" id="overlay" onclick="closeMobile()"></div>
+<div class="mobile-bar">
+  <button onclick="openMobile()">☰</button>
+  <div class="mb-title">A<span>P</span>EX</div>
+  <button class="mb-theme" onclick="toggleTheme()">◐</button>
+</div>
+
+<!-- ===== LOGIN ===== -->
+<div class="login-screen" id="loginScreen">
+<div class="login-card">
+  <h1>A<span>P</span>EX</h1>
+  <div style="font-size:10px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--ac);margin-bottom:4px">Коучинговая программа</div>
+  <div style="font-family:var(--fd);font-size:15px;color:var(--t1);margin-bottom:6px">Годовая декомпозиция</div>
+  <div class="sub">Интерактивная система планирования жизни и бизнеса от Анастасии Соулс. Заполняйте, отмечайте прогресс, отслеживайте результаты.</div>
+  <div id="loginError" style="display:none;padding:10px;margin-bottom:12px;border-radius:var(--r3);background:var(--rs2);border:1px solid var(--rs);color:var(--rs);font-size:12px;text-align:left"></div>
+  <input class="login-input" id="codeIn" placeholder="Введите код от коуча..." autofocus>
+  <button class="login-btn" onclick="loginClient()">Войти как клиент</button>
+  <div style="font-size:10px;color:var(--t4);margin-top:6px;line-height:1.5">Код выдаёт коуч. Если у вас нет кода — обратитесь к Анастасии.</div>
+  <div class="login-divider">или</div>
+  <button class="login-ghost" onclick="loginAdmin()">Войти как коуч-администратор</button>
+  <button onclick="toggleTheme()" style="margin-top:16px;padding:8px 16px;border-radius:99px;background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-family:var(--fb);font-size:12px;cursor:pointer">◐ Светлая / тёмная тема</button>
+</div>
+</div>
+
+<!-- ===== APP ===== -->
+<div class="app hidden" id="app">
+<aside class="sidebar" id="sidebar"></aside>
+<main class="main" id="mainContent"></main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+// ===== SUPABASE CONFIG =====
+// Замените эти значения на свои из Supabase Dashboard → Settings → API
+const SUPABASE_URL = 'https://mzikjfwohagyowfqdwsx.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_0a0lCROfppd1yu9XvQJgFQ_an9KOlx7';
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ===== STORAGE LAYER (Supabase + localStorage fallback) =====
+// Локальный кэш для мгновенного UI
+const _cache = {};
+
+// Синхронное чтение из кэша (для UI)
+function S(k) {
+  if (_cache[k] !== undefined) return _cache[k];
+  try { const v = localStorage.getItem(k); const r = v ? JSON.parse(v) : null; _cache[k] = r; return r; } catch { return null; }
+}
+
+// Запись: сразу в кэш + localStorage, асинхронно в Supabase
+function W(k, v) {
+  _cache[k] = v;
+  try { if (v === null) { localStorage.removeItem(k); } else { localStorage.setItem(k, JSON.stringify(v)); } } catch {}
+  // Async save to Supabase (fire and forget for UI speed)
+  _supabaseWrite(k, v).catch(e => console.warn('Supabase write error:', e));
+}
+
+async function _supabaseWrite(k, v) {
+  if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR_')) return;
+  if (v === null) {
+    await sb.from('apex_store').delete().eq('key', k);
+  } else {
+    await sb.from('apex_store').upsert({ key: k, value: v, updated_at: new Date().toISOString() });
+  }
+}
+
+// Загрузка ВСЕХ данных из Supabase при старте
+async function loadAllFromSupabase() {
+  if (!SUPABASE_URL || SUPABASE_URL.includes('YOUR_')) return;
+  try {
+    const { data, error } = await sb.from('apex_store').select('key, value');
+    if (error) { console.warn('Supabase load error:', error); return; }
+    if (data && data.length > 0) {
+      data.forEach(row => {
+        _cache[row.key] = row.value;
+        try { localStorage.setItem(row.key, JSON.stringify(row.value)); } catch {}
+      });
+      console.log(`APEX: загружено ${data.length} записей из Supabase`);
+    }
+  } catch(e) { console.warn('Supabase unavailable, using localStorage:', e); }
+}
+
+let mode='',currentCode='',clientInfo=null,clientData=null,saveT=null,timerInt=null,timerSec=25*60,timerOn=false,timerPre=25;
+
+// ===== INIT: load from Supabase then check auto-login =====
+(async () => {
+  // Show loading state
+  const loginCard = document.querySelector('.login-card');
+  if (loginCard) {
+    const loader = document.createElement('div');
+    loader.id = 'sbLoader';
+    loader.style.cssText = 'position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;border-radius:var(--r)';
+    loader.innerHTML = '<div style="font-family:var(--fd);font-size:28px;color:var(--ac);margin-bottom:10px">A<span style="color:var(--t1)">P</span>EX</div><div style="font-size:12px;color:var(--t3)">Загрузка данных...</div>';
+    loginCard.style.position = 'relative';
+    loginCard.appendChild(loader);
+  }
+
+  await loadAllFromSupabase();
+
+  const loader = document.getElementById('sbLoader');
+  if (loader) loader.remove();
+
+  // Auto-login from hash
+  const hash = location.hash.slice(1);
+  if (hash && hash !== 'admin') { document.getElementById('codeIn').value = hash; loginClient(); }
+})();
+
+const defaultData=()=>({
+  completed:[],vision:{y1:'',y3:'',y5:'',y10:''},friends:['','','','',''],values:['','',''],
+  spheres:['Карьера / Статус','Финансы / Доход','Здоровье / Энергия','Отношения / Семья','Развитие / Образование','Отдых / Хобби','Вклад / Влияние','Окружение / Нетворк'].map(n=>({
+    name:n, yearGoal:'', monthGoals:Array(12).fill(''),
+    tasks:Array(12).fill(null).map(()=>[[],[],[],[]])
+  })),
+  health:Array(12).fill(null),beliefs:{want:'',benefits:'',limiting:''},pleasantville:{q1:'',q2:'',q3:'',main:''},
+  timeblocks:[],deepwork:{sessions:0,minutes:0,streak:0,lastDate:''},journal:[],painlog:[],principles:[],
+  priorities:['','','','',''],decisions:{type1:[],type2:[]},
+  assignments:[],
+  finance:{tariff:'',totalSessions:0,totalPrice:0,sessions:[],payments:[]}
+});
+
+const defaultProgram=[
+  {phase:"4 ознакомительные сессии",sessions:[
+    {n:1,t:"Знакомство с программой и формулирование первичного запроса",c:"*Если вы хотите сократить это время, вам направят 2 ссылки на лекции, вы соберете список вопросов",hw:""},
+    {n:2,t:"Что такое отложенное вознаграждение? Как сформулировать собственный запрос?",c:"",hw:""},
+    {n:3,t:"Как расширить текущее восприятие и переформулировать запрос повторно?",c:"",hw:"Просмотр фильма \"Плезантвиль\" и составление вопросов"},
+    {n:4,t:"Переформулирование запроса с учетом видения, а не целей",c:"",hw:"Годовая декомпозиция"},
+  ]},
+  {phase:"Годовая декомпозиция",sessions:[
+    {n:1,t:"Формулировка финального видения и составление карты ценностей",c:"",hw:""},
+    {n:2,t:"Ретроспектива прошлого года в Miro",c:"",hw:""},
+    {n:3,t:"Годовая декомпозиция (задание №4)",c:"",hw:""},
+    {n:4,t:"Годовая декомпозиция (задание №4)",c:"",hw:""},
+    {n:5,t:"Визуальная карта целей по всем сферам на 1 год",c:"",hw:""},
+    {n:6,t:"Оформление 1-го рабочего месяца и внедрение бизнес/личных задач",c:"",hw:""},
+    {n:7,t:"Декомпозиция задач в календарь и выстраивание работы с ассистентом",c:"",hw:""},
+  ]},
+  {phase:"20 сессий",sessions:[
+    {n:1,t:"Индивидуальная система постановки задач",c:"*Составите полный план для всей команды и соберете личную дуальную систему ведения задач",hw:""},
+    {n:2,t:"",c:"",hw:""},{n:3,t:"",c:"",hw:""},{n:4,t:"",c:"",hw:""},
+    {n:5,t:"Итог 1-го месяца работы, выводы и новые задачи",c:"",hw:""},
+    {n:6,t:"Перестраивание собственной системы трекинга и управления",c:"Совместно с Анастасией анализируете задачи, которые вы саботируете / не выполняете",hw:""},
+    {n:7,t:"",c:"",hw:""},{n:8,t:"",c:"",hw:""},
+    {n:9,t:"Итог 2-го месяца работы, выводы и новые задачи",c:"",hw:""},
+    {n:10,t:"Собственные искажения и создание личной системы по работе с ними",c:"",hw:""},
+    {n:11,t:"Снижение рабочей нагрузки. Работа с увольнением, наймом и делегированием",c:"",hw:""},
+    {n:12,t:"",c:"",hw:""},
+    {n:13,t:"Итог 3-го месяца работы, выводы и новые задачи",c:"",hw:""},
+    {n:14,t:"Снижение рабочей нагрузки. Работа с увольнением, наймом и делегированием",c:"",hw:""},
+    {n:15,t:"",c:"",hw:""},{n:16,t:"",c:"",hw:""},
+    {n:17,t:"Формирование следующего месяца с учетом дивергентного мышления",c:"*Вы ускорите достижение своих целей — поменяете цели и задачи на более масштабные",hw:""},
+    {n:18,t:"Свободные занятия",c:"*Всё, что не успеваете пройти — переходит на следующий пакет",hw:""},
+    {n:19,t:"",c:"",hw:""},{n:20,t:"",c:"",hw:""},
+  ]},
+  {phase:"52 сессии",sessions:[
+    {n:21,t:"Создание орг.структуры компании или пересмотр текущей модели",c:"*Трекинг по месяцам автоматизирован и коучем не проверяется",hw:""},
+    {n:22,t:"Создание (или перестраивание) системы мотивации в компании",c:"",hw:""},
+    {n:23,t:"",c:"",hw:""},
+    {n:24,t:"Корпоративный коучинг",c:"",hw:""},
+    {n:25,t:"",c:"",hw:""},
+    {n:26,t:"Фокус полугодия бизнеса на одном отделе компании",c:"",hw:""},
+    {n:27,t:"Создание карты личных убеждений (позитивных и негативных)",c:"",hw:""},
+    {n:28,t:"Ограничивающие убеждения",c:"",hw:""},
+    {n:29,t:"",c:"",hw:""},{n:30,t:"",c:"",hw:""},{n:31,t:"",c:"",hw:""},
+    {n:32,t:"Решения, которые изменят вашу жизнь",c:"",hw:""},
+    {n:33,t:"Стратегия по масштабным решениям",c:"",hw:""},
+    {n:34,t:"",c:"",hw:""},
+    {n:35,t:"Пересмотр годовой цели",c:"",hw:""},
+    {n:36,t:"Формирование инвестиционного мышления",c:"",hw:""},
+    {n:37,t:"Создание финансовой модели бизнеса для принятия решений",c:"",hw:""},
+    {n:38,t:"Управление бизнесом через финансовую модель",c:"",hw:""},
+    {n:39,t:"",c:"",hw:""},{n:40,t:"",c:"",hw:""},{n:41,t:"",c:"",hw:""},
+    {n:42,t:"Личная инвестиционная стратегия",c:"",hw:""},
+    {n:43,t:"Кредиты, накопления, капитализация",c:"",hw:""},
+    {n:44,t:"Устаревшие модели в бизнесе → поиск новых направлений",c:"",hw:""},
+    {n:45,t:"Саботаж",c:"",hw:""},
+    {n:46,t:"Свободные занятия",c:"*Всё, что не успеваете — переходит на следующий пакет",hw:""},
+    {n:47,t:"",c:"",hw:""},{n:48,t:"",c:"",hw:""},{n:49,t:"",c:"",hw:""},
+    {n:50,t:"",c:"",hw:""},{n:51,t:"",c:"",hw:""},{n:52,t:"",c:"",hw:""},
+  ]},
+  {phase:"96 сессий",sessions:[
+    {n:53,t:"Запуск нового направления бизнеса",c:"",hw:""},
+    {n:54,t:"",c:"",hw:""},{n:55,t:"",c:"",hw:""},{n:56,t:"",c:"",hw:""},
+    {n:57,t:"Проявленность",c:"",hw:""},
+    {n:58,t:"Стратегия запуска медийности",c:"",hw:""},
+    {n:59,t:"Работа над стратегией запуска медийности",c:"",hw:""},
+    {n:60,t:"",c:"",hw:""},{n:61,t:"",c:"",hw:""},{n:62,t:"",c:"",hw:""},
+    {n:63,t:"Что такое масштабирование бизнеса?",c:"",hw:""},
+    {n:64,t:"Создание собственной стратегии масштабирования бизнеса",c:"",hw:""},
+    {n:65,t:"Работа над стратегией масштабирования бизнеса",c:"",hw:""},
+    {n:66,t:"",c:"",hw:""},{n:67,t:"",c:"",hw:""},{n:68,t:"",c:"",hw:""},
+    {n:69,t:"Создание личной психологической карты",c:"",hw:""},
+    {n:70,t:"",c:"",hw:""},{n:71,t:"",c:"",hw:""},{n:72,t:"",c:"",hw:""},
+    {n:73,t:"",c:"",hw:""},{n:74,t:"",c:"",hw:""},
+    {n:75,t:"Зависимости и созависимости",c:"",hw:""},
+    {n:76,t:"Барьеры в обучении",c:"",hw:""},
+    {n:77,t:"Создание семейной карты целей и ценностей",c:"",hw:""},
+    {n:78,t:"",c:"",hw:""},{n:79,t:"",c:"",hw:""},
+    {n:80,t:"Семья и партнерство",c:"",hw:""},
+    {n:81,t:"Зарубежные и новые рынки",c:"",hw:""},
+    {n:82,t:"Стратегия по выходу на новые рынки",c:"",hw:""},
+    {n:83,t:"Трекинг отношений в команде",c:"",hw:""},
+    {n:84,t:"Работа с командой",c:"",hw:""},
+    {n:85,t:"",c:"",hw:""},{n:86,t:"",c:"",hw:""},
+    {n:87,t:"Создание 5 или 10-летней бизнес-стратегии",c:"",hw:""},
+    {n:88,t:"Юнг. Теневая сторона",c:"",hw:""},
+    {n:89,t:"Память, внимание, скорость мышления",c:"",hw:""},
+    {n:90,t:"Свободные занятия",c:"*Всё, что не успеваете — переходит на следующий пакет",hw:""},
+    {n:91,t:"",c:"",hw:""},{n:92,t:"",c:"",hw:""},{n:93,t:"",c:"",hw:""},
+    {n:94,t:"",c:"",hw:""},{n:95,t:"",c:"",hw:""},{n:96,t:"",c:"",hw:""},
+  ]},
+];
+// Get program template - admin can override
+function getProgram(code){const custom=S('prog:'+code);return custom||S('prog-template')||defaultProgram}
+const healthQ=["Засыпаю до 1 ночи","Легко просыпаюсь","Знаю здоровье организма","Нет серьёзных проблем","План — выполняю","Нанимал сотрудников","Говорю о себе публично","Хорошие отношения с родителями","В порядке в отношениях","Нет пищевых расстройств","Спокоен и неимпульсивен","Мало нервничаю"];
+const months=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'];
+
+// ===== LOGIN =====
+document.getElementById('codeIn').addEventListener('keydown',e=>{if(e.key==='Enter')loginClient()});
+
+function loginClient(){
+  const code=document.getElementById('codeIn').value.trim().toLowerCase();
+  const errEl=document.getElementById('loginError');
+  errEl.style.display='none';
+  if(!code){errEl.textContent='Введите код клиента';errEl.style.display='block';return}
+  const cl=S('cl:'+code);
+  if(!cl){errEl.textContent='Клиент с кодом «'+code+'» не найден. Проверьте код или обратитесь к коучу.';errEl.style.display='block';return}
+  mode='client';currentCode=code;clientInfo=cl;
+  clientData=S('d:'+code)||defaultData();
+  cl.lastActive=new Date().toISOString();W('cl:'+code,cl);
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  buildClientUI();
+}
+
+function loginAdmin(){
+  const pwd = prompt('Введите пароль администратора:');
+  if(pwd !== '4177'){
+    if(pwd !== null) alert('Неверный пароль');
+    return;
+  }
+  mode='admin';
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  buildAdminUI();
+}
+
+function logout(){mode='';currentCode='';clientInfo=null;clientData=null;
+  document.getElementById('loginScreen').classList.remove('hidden');
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('codeIn').value='';
+  if(timerInt){clearInterval(timerInt);timerOn=false}}
+
+// ===== SAVE =====
+function save(noRerender){clearTimeout(saveT);
+  saveT=setTimeout(()=>{W('d:'+currentCode,clientData);showSVI('saved')},2000)}
+function saveFin(){clearTimeout(saveT);
+  saveT=setTimeout(()=>{W('d:'+currentCode,clientData);showSVI('saved')},2500)}
+function showSVI(s){const e=document.getElementById('svi');e.className='svi '+s;
+  e.textContent=s==='saving'?'':'✓ Сохранено';
+  if(s!=='saving')setTimeout(()=>e.className='svi',2000)}
+function toast(m,c='em'){const t=document.createElement('div');t.className='toast';
+  if(c==='rs'){t.style.borderColor='var(--rs)';t.style.color='var(--rs)'}
+  t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),3000)}
+
+// ===== NAV =====
+function nav(page){
+  document.querySelectorAll('.nav-i').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.pg').forEach(p=>p.classList.remove('active'));
+  document.querySelector(`.nav-i[data-p="${page}"]`)?.classList.add('active');
+  document.getElementById('p_'+page)?.classList.add('active');
+  closeMobile();
+}
+
+// ===== BUILD CLIENT UI =====
+function buildClientUI(){
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML=`
+  <div class="sidebar-top"><h1>A<span>P</span>EX</h1><button class="logout" onclick="logout()">✕</button></div>
+  <div class="sidebar-user"><div class="sidebar-avatar">${clientInfo.name[0].toUpperCase()}</div><div><div class="sidebar-uname">${clientInfo.name}</div><div class="sidebar-urole">Клиент</div></div></div>
+  <div class="nav-sec">Программа</div>
+  <div class="nav-i active" data-p="dash" onclick="nav('dash')"><span class="ic">◉</span>Дашборд</div>
+  <div class="nav-i" data-p="prog" onclick="nav('prog')"><span class="ic">▣</span>Сессии</div>
+  <div class="nav-sec">Планирование</div>
+  <div class="nav-i" data-p="vision" onclick="nav('vision')"><span class="ic">◇</span>Видение</div>
+  <div class="nav-i" data-p="decomp" onclick="nav('decomp')"><span class="ic">▦</span>Декомпозиция</div>
+  <div class="nav-i" data-p="backlog" onclick="nav('backlog')"><span class="ic">☰</span>Backlog</div>
+  <div class="nav-i" data-p="values" onclick="nav('values')"><span class="ic">★</span>Ценности</div>
+  <div class="nav-sec">APEX Tools</div>
+  <div class="nav-i" data-p="tb" onclick="nav('tb')"><span class="ic">▤</span>Time Blocks<span class="badge">Musk</span></div>
+  <div class="nav-i" data-p="dw" onclick="nav('dw')"><span class="ic">◎</span>Deep Work<span class="badge">Newport</span></div>
+  <div class="nav-i" data-p="journal" onclick="nav('journal')"><span class="ic">✎</span>Журнал<span class="badge">Blakely</span></div>
+  <div class="nav-i" data-p="pain" onclick="nav('pain')"><span class="ic">⚡</span>Pain Log<span class="badge">Dalio</span></div>
+  <div class="nav-i" data-p="princ" onclick="nav('princ')"><span class="ic">◆</span>Принципы<span class="badge">Dalio</span></div>
+  <div class="nav-i" data-p="prior" onclick="nav('prior')"><span class="ic">✦</span>5 приоритетов<span class="badge">Buffett</span></div>
+  <div class="nav-sec">Диагностика</div>
+  <div class="nav-i" data-p="health" onclick="nav('health')"><span class="ic">♥</span>Здоровье</div>
+  <div class="nav-i" data-p="beliefs" onclick="nav('beliefs')"><span class="ic">☯</span>Убеждения</div>
+  <div class="nav-sec">От коуча</div>
+  <div class="nav-i" data-p="assignments" onclick="nav('assignments')"><span class="ic">📋</span>Задания от Анастасии</div>
+  <div class="nav-i" data-p="finance" onclick="nav('finance')"><span class="ic">💳</span>Сессии и оплаты</div>
+  <div class="nav-i" data-p="tariffs" onclick="nav('tariffs')"><span class="ic">🥥</span>Тарифы</div>
+  <div class="nav-sec">Настройки</div>
+  <div class="nav-i" data-p="settings" onclick="nav('settings')"><span class="ic">⚙</span>Настройки</div>
+  <div style="padding:14px 18px;border-top:1px solid var(--bd);margin-top:auto">
+    <button onclick="toggleTheme()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-family:var(--fb);font-size:12px;cursor:pointer">◐ Сменить тему</button>
+  </div>`;
+
+  const mc=document.getElementById('mainContent');
+  mc.innerHTML=`
+  <div class="pg active" id="p_dash"></div>
+  <div class="pg" id="p_prog"></div>
+  <div class="pg" id="p_vision"></div>
+  <div class="pg" id="p_decomp"></div>
+  <div class="pg" id="p_backlog"></div>
+  <div class="pg" id="p_values"></div>
+  <div class="pg" id="p_tb"></div>
+  <div class="pg" id="p_dw"></div>
+  <div class="pg" id="p_journal"></div>
+  <div class="pg" id="p_pain"></div>
+  <div class="pg" id="p_princ"></div>
+  <div class="pg" id="p_prior"></div>
+  <div class="pg" id="p_health"></div>
+  <div class="pg" id="p_beliefs"></div>
+  <div class="pg" id="p_assignments"></div>
+  <div class="pg" id="p_finance"></div>
+  <div class="pg" id="p_tariffs"></div>
+  <div class="pg" id="p_settings"></div>`;
+  renderClient();
+}
+
+function renderClient(){renderDash();renderProg();renderVision();renderDecomp();renderBacklog();renderValues();renderTB();renderDW();renderJournal();renderPain();renderPrinc();renderPrior();renderHealth();renderBeliefs();renderAssignments();renderFinance();renderTariffs();renderSettings()}
+
+// ===== DASHBOARD =====
+function renderDash(){
+  const d=clientData;
+  const cprog=d.clientProg||getProgram(currentCode);
+  let total=0,done=0;cprog.forEach(ph=>ph.sessions.forEach(s=>{total++;if(s.done)done++}));
+  const pct=total?Math.round(done/total*100):0;
+  const today=new Date().toLocaleDateString('ru-RU');
+  const tblocks=d.timeblocks.filter(b=>b.date===today);
+  document.getElementById('p_dash').innerHTML=`
+  <div class="pg-h"><h2>Добро пожаловать, ${clientInfo.name}</h2><p>Ваша персональная система планирования</p></div>
+  <div class="pg-b">
+    <div class="g4">
+      <div class="cd ac"><div class="cd-t">Программа</div><div class="cd-v">${pct}%</div><div class="cd-s">${done}/${total} сессий</div></div>
+      <div class="cd em"><div class="cd-t">Deep Work</div><div class="cd-v">${d.deepwork.minutes}'</div><div class="cd-s">${d.deepwork.sessions} сессий</div></div>
+      <div class="cd gd"><div class="cd-t">Принципов</div><div class="cd-v">${d.principles.length}</div><div class="cd-s">Библиотека Dalio</div></div>
+      <div class="cd rs"><div class="cd-t">Журнал</div><div class="cd-v">${d.journal.length}</div><div class="cd-s">Записей</div></div>
+    </div>
+    <div style="margin-top:24px">
+      <div class="pr"><div class="pr-l">Программа</div><div class="pr-tr"><div class="pr-f" style="width:${pct}%;background:var(--ac)"></div></div><div class="pr-p">${pct}%</div></div>
+      <div class="pr"><div class="pr-l">Блоки сегодня</div><div class="pr-tr"><div class="pr-f" style="width:${Math.min(100,tblocks.length*10)}%;background:var(--em)"></div></div><div class="pr-p">${tblocks.length}</div></div>
+      <div class="pr"><div class="pr-l">Принципы</div><div class="pr-tr"><div class="pr-f" style="width:${Math.min(100,d.principles.length*10)}%;background:var(--gd)"></div></div><div class="pr-p">${d.principles.length}</div></div>
+    </div>
+  </div>`;
+}
+
+// ===== PROGRAM =====
+function renderProg(){
+  // Each client gets their own copy of the program that can be edited
+  if(!clientData.clientProg){
+    clientData.clientProg=JSON.parse(JSON.stringify(getProgram(currentCode)));
+    save();
+  }
+  const prog=clientData.clientProg;
+  if(!clientData.sessNotes) clientData.sessNotes={};
+
+  let totalSess=0, doneSess=0;
+  prog.forEach(ph=>ph.sessions.forEach(s=>{totalSess++;if(s.done)doneSess++}));
+  const pct=totalSess?Math.round(doneSess/totalSess*100):0;
+
+  let h=`<div class="pg-h"><h2>Программа сессий</h2><p>${totalSess} занятий · ${doneSess} пройдено</p></div><div class="pg-b">
+  <div class="pr" style="margin-bottom:20px"><div class="pr-l">Прогресс</div><div class="pr-tr"><div class="pr-f" style="width:${pct}%;background:linear-gradient(90deg,var(--ac),var(--em))"></div></div><div class="pr-p">${doneSess}/${totalSess}</div></div>`;
+
+  h+=`<div style="overflow-x:auto"><table class="sess-tbl">
+  <thead><tr>
+    <th style="width:30px">№</th>
+    <th style="min-width:180px">Тема занятия</th>
+    <th style="min-width:180px">Комментарий</th>
+    <th style="min-width:140px">Домашнее задание</th>
+    <th style="min-width:160px">Комментарий от Анастасии</th>
+    <th style="min-width:120px">Итог занятия</th>
+    <th style="width:45px">✓</th>
+    <th style="width:30px"></th>
+  </tr></thead><tbody>`;
+
+  prog.forEach((ph,pi)=>{
+    h+=`<tr class="phase-row"><td colspan="8" style="position:relative">${esc(ph.phase)}
+      <button onclick="addSessRow(${pi})" style="position:absolute;right:8px;top:50%;transform:translateY(-50%);background:var(--ac3);border:1px solid rgba(200,162,255,.2);color:var(--ac);font-size:10px;padding:3px 10px;border-radius:99px;cursor:pointer">+ сессия</button>
+    </td></tr>`;
+
+    ph.sessions.forEach((s,si)=>{
+      const dn=!!s.done;
+      h+=`<tr class="${dn?'row-done':''}">
+        <td class="sn">${s.n}</td>
+        <td><textarea class="sess-topic" placeholder="Тема занятия..." onchange="editSess(${pi},${si},'t',this.value)">${esc(s.t||'')}</textarea></td>
+        <td><textarea placeholder="Комментарий..." onchange="editSess(${pi},${si},'c',this.value)">${esc(s.c||'')}</textarea></td>
+        <td><textarea placeholder="Домашнее задание..." style="color:var(--bl)" onchange="editSess(${pi},${si},'hw',this.value)">${esc(s.hw||'')}</textarea></td>
+        <td><textarea placeholder="От Анастасии..." onchange="editSess(${pi},${si},'coachComment',this.value)">${esc(s.coachComment||'')}</textarea></td>
+        <td><textarea placeholder="Итог..." onchange="editSess(${pi},${si},'result',this.value)">${esc(s.result||'')}</textarea></td>
+        <td class="sc"><div class="sess-done-check ${dn?'done':''}" onclick="togSessNew(${pi},${si})"></div></td>
+        <td class="sc"><button class="tk-x" style="width:18px;height:18px;font-size:10px" onclick="delSessRow(${pi},${si})">×</button></td>
+      </tr>`;
+    });
+  });
+
+  h+=`</tbody></table></div></div>`;
+  document.getElementById('p_prog').innerHTML=h;
+}
+
+function editSess(pi,si,field,value){
+  clientData.clientProg[pi].sessions[si][field]=value;
+  save();
+}
+
+function togSessNew(pi,si){
+  const s=clientData.clientProg[pi].sessions[si];
+  s.done=!s.done;
+
+  // When session marked done AND has homework -> auto-create assignment
+  if(s.done && s.hw && s.hw.trim()){
+    if(!clientData.assignments) clientData.assignments=[];
+    const hwId='hw_'+pi+'_'+si;
+    const exists=clientData.assignments.some(a=>a.id===hwId);
+    if(!exists){
+      clientData.assignments.push({
+        id:hwId,
+        title:'ДЗ: '+s.hw.substring(0,60),
+        description:'Домашнее задание после сессии «'+(s.t||'Сессия '+s.n)+'»:\n\n'+s.hw,
+        type:'text',
+        fromCoach:true,
+        createdAt:new Date().toISOString()
+      });
+    }
+  }
+
+  save();renderProg();renderDash();
+  if(s.done && s.hw) renderAssignments();
+}
+
+function addSessRow(pi){
+  const sessions=clientData.clientProg[pi].sessions;
+  const lastN=sessions.length>0?sessions[sessions.length-1].n:0;
+  sessions.push({n:lastN+1,t:'',c:'',hw:'',coachComment:'',result:'',done:false});
+  save();renderProg();
+}
+
+function delSessRow(pi,si){
+  clientData.clientProg[pi].sessions.splice(si,1);
+  // Renumber
+  clientData.clientProg[pi].sessions.forEach((s,i)=>s.n=i+1);
+  save();renderProg();
+}
+
+// ===== VISION =====
+function renderVision(){
+  const v=clientData.vision;
+  const cards=[
+    {period:'1 год',key:'y1',color:'var(--ac)',
+      hint:'Как вы представляете свою жизнь через год? Где живёте, чем занимаетесь, сколько зарабатываете? Кто рядом с вами?',
+      placeholder:'Опишите вашу жизнь через 1 год: работа, доход, отношения, здоровье, окружение...'},
+    {period:'3 года',key:'y3',color:'var(--em)',
+      hint:'Через 3 года ваша жизнь должна заметно отличаться от текущей. Какой бизнес вы построили? Какой образ жизни ведёте?',
+      placeholder:'Бизнес, доход, место жизни, навыки, отношения, вклад в мир...'},
+    {period:'5 лет',key:'y5',color:'var(--gd)',
+      hint:'Здесь начинается масштаб. Какое влияние вы оказываете? Что о вас говорят? Какие проекты запустили?',
+      placeholder:'Масштаб, влияние, проекты, команда, активы, стиль жизни...'},
+    {period:'10 лет',key:'y10',color:'var(--rs)',
+      hint:'Ваше видение через 10 лет должно выглядеть для вас НЕРЕАЛЬНЫМ, невозможным и сложным. Когда вы это пишете — вы не верите себе. Местами вам может быть смешно, что вы это придумали. Это нормально. Так и должно быть.',
+      placeholder:'Пишите то, во что сами не верите. Чем масштабнее — тем лучше. Если не страшно — мыслите крупнее.'},
+  ];
+
+  document.getElementById('p_vision').innerHTML=`
+  <div class="pg-h"><h2>Видение будущего</h2><p>Запланируйте себе — себя</p></div>
+  <div class="pg-b">
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:24px;border-left:4px solid var(--ac)">
+      <div style="font-size:14px;font-weight:600;color:var(--ac);margin-bottom:8px">📖 Как заполнять видение</div>
+      <div style="font-size:13px;color:var(--t2);line-height:1.7">
+        <b>Запланируйте себе — себя.</b> Как вы представляете свою жизнь? К чему вы можете прийти?
+        <br><br>
+        Вы планируете свою жизнь не только из своего видения, но и <b>исходя из общения с 5-ю друзьями</b>. Задайте им вопрос: <i style="color:var(--gd)">«К чему я могу прийти? Чего я могу достичь?»</i>
+        <br><br>
+        Ваша задача — покреативить с ними и записать их предложения. Это нужно, чтобы получить обратную связь — <b>часто другие люди видят нас масштабнее, чем мы сами себе позволяем быть.</b>
+        <br><br>
+        <span style="color:var(--rs)">Ваше видение через 10 лет должно выглядеть для вас нереальным, невозможным и сложным. Так что, когда вы это пишете, вы не верите себе. Местами — вам может быть смешно, что вы это придумали.</span>
+      </div>
+    </div>
+
+    <div class="vis-g">
+      ${cards.map(c=>`
+        <div class="vis-c">
+          <div class="per">${c.period}</div>
+          <div style="font-size:10px;color:var(--t4);line-height:1.5;margin-bottom:10px;padding:8px;background:var(--bg3);border-radius:var(--r3);border-left:2px solid ${c.color}">${c.hint}</div>
+          <textarea placeholder="${c.placeholder}" oninput="clientData.vision.${c.key}=this.value;save()">${v[c.key]}</textarea>
+        </div>`).join('')}
+    </div>
+
+    <h3 style="font-family:var(--fd);margin:32px 0 8px;font-size:17px">Обратная связь от 5 друзей</h3>
+    <div style="font-size:12px;color:var(--t3);margin-bottom:14px;line-height:1.6">
+      Задайте каждому вопрос: <i style="color:var(--gd)">«К чему я могу прийти? Чего я могу достичь?»</i> — и запишите их ответы. Не спорьте, не фильтруйте. Просто запишите.
+    </div>
+    <div class="tk">${clientData.friends.map((f,i)=>`<div class="tk-i">
+      <span style="font-family:var(--fm);font-size:12px;color:var(--ac);font-weight:700;min-width:28px">${String(i+1).padStart(2,'0')}</span>
+      <input value="${f}" placeholder="Имя друга — его/её ответ..." style="flex:1;background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" oninput="clientData.friends[${i}]=this.value;save()">
+    </div>`).join('')}
+    </div>
+    <button class="btn btn-g" style="margin-top:10px" onclick="clientData.friends.push('');save();renderVision()">+ Добавить друга</button>
+  </div>`;
+}
+
+// ===== DECOMPOSITION =====
+function renderDecomp(){
+  // Migrate old data format if needed
+  clientData.spheres.forEach((s,i)=>{
+    if(!s.yearGoal && s.yearGoal!=='') s.yearGoal=s.action||'';
+    if(!s.monthGoals) s.monthGoals=s.months||Array(12).fill('');
+    if(!s.tasks) s.tasks=Array(12).fill(null).map(()=>[[],[],[],[]]);
+    // Ensure each month has 4 sprint arrays
+    s.tasks.forEach((sprints,mi)=>{if(!Array.isArray(sprints)||sprints.length!==4) s.tasks[mi]=[[],[],[],[]]});
+  });
+
+  let h=`<div class="pg-h"><h2>Годовая декомпозиция</h2><p>Сферы × 12 месяцев × 4 спринта. Нажмите на месяц для раскрытия задач.</p></div><div class="pg-b">`;
+
+  // Add sphere button
+  h+=`<div class="irow" style="margin-bottom:18px"><input id="newSphName" placeholder="Добавить новую сферу..."><button class="btn btn-a" onclick="addSphere()">+ Сфера</button></div>`;
+
+  clientData.spheres.forEach((sph,si)=>{
+    h+=`<div class="dec-sphere" id="dsph_${si}">`;
+    // Header
+    h+=`<div class="dec-sphere-h" onclick="document.getElementById('dsph_${si}').classList.toggle('open')">
+      <div class="dec-sphere-left">
+        <div class="dec-sphere-name">${sph.name}</div>
+        <div class="dec-sphere-goal">${sph.yearGoal||'Нет цели на год'}</div>
+      </div><div class="dec-sphere-arrow">▼</div></div>`;
+
+    // Body
+    h+=`<div class="dec-sphere-body">`;
+    // Year goal row
+    h+=`<div class="dec-year-row">
+      <label>🎯 Цель на год</label>
+      <input value="${esc(sph.yearGoal)}" placeholder="Например: выйти на доход 5000€/мес" oninput="clientData.spheres[${si}].yearGoal=this.value;save()">
+    </div>`;
+
+    // Months scroll
+    h+=`<div class="dec-months">`;
+    months.forEach((m,mi)=>{
+      const tasks=sph.tasks[mi];
+      const totalTasks=tasks.reduce((s,sp)=>s+sp.length,0);
+      const doneTasks=tasks.reduce((s,sp)=>s+sp.filter(t=>t.done).length,0);
+
+      h+=`<div class="dec-month">`;
+      h+=`<div class="dec-month-h" onclick="expandMonth(${si},${mi})">${m}${totalTasks?` <span style="color:var(--em)">${doneTasks}/${totalTasks}</span>`:''}</div>`;
+      h+=`<div class="dec-month-goal"><input value="${esc(sph.monthGoals[mi])}" placeholder="Цель на ${m}..." oninput="clientData.spheres[${si}].monthGoals[${mi}]=this.value;save()"></div>`;
+
+      // Compact task view
+      h+=`<div class="dec-tasks-area">`;
+      ['Спринт 1','Спринт 2','Спринт 3','Спринт 4'].forEach((sp,spi)=>{
+        if(tasks[spi].length>0){
+          h+=`<div class="dec-sprint-label">${sp}</div>`;
+          tasks[spi].forEach((task,ti)=>{
+            h+=`<div class="dec-task">
+              <div class="dec-task-check ${task.done?'done':''}" onclick="togDecTask(${si},${mi},${spi},${ti})"></div>
+              <div class="dec-task-text ${task.done?'done':''}">${esc(task.text)}</div>
+              <button class="dec-task-cal" title="Добавить в Google Calendar" onclick="addToGCal(${si},${mi},${spi},${ti})">📅</button>
+              <button class="dec-task-rm" onclick="rmDecTask(${si},${mi},${spi},${ti})">×</button>
+            </div>`;
+          });
+        }
+      });
+      h+=`<div class="dec-add-task" onclick="expandMonth(${si},${mi})">+ задачи</div>`;
+      h+=`</div></div>`;
+    });
+    h+=`</div>`; // months
+
+    h+=`</div></div>`; // sphere-body, dec-sphere
+  });
+
+  // Expanded month modal
+  h+=`<div id="decExpandedModal" style="display:none"></div>`;
+  h+=`</div>`;
+  document.getElementById('p_decomp').innerHTML=h;
+}
+
+function esc(s){return (s||'').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;')}
+
+function addSphere(){
+  const name=document.getElementById('newSphName').value.trim();if(!name)return;
+  clientData.spheres.push({name,yearGoal:'',monthGoals:Array(12).fill(''),tasks:Array(12).fill(null).map(()=>[[],[],[],[]])});
+  document.getElementById('newSphName').value='';save();renderDecomp();toast('Сфера добавлена')}
+
+function expandMonth(si,mi){
+  const sph=clientData.spheres[si];
+  const m=months[mi];
+  const tasks=sph.tasks[mi];
+  const sprintNames=['Спринт 1 (Нед 1)','Спринт 2 (Нед 2)','Спринт 3 (Нед 3)','Спринт 4 (Нед 4)'];
+  const sprintColors=['s1','s2','s3','s4'];
+
+  let h=`<div class="dec-month-expanded">
+    <div class="dec-expanded-header">
+      <div>
+        <div class="dec-expanded-title">${sph.name} → ${m}</div>
+        <div style="font-size:12px;color:var(--gd);margin-top:4px">${sph.monthGoals[mi]||'Нет цели на месяц'}</div>
+      </div>
+      <button class="dec-close-expanded" onclick="closeExpanded()">✕</button>
+    </div>
+    <div class="dec-sprints-grid">`;
+
+  sprintNames.forEach((sp,spi)=>{
+    h+=`<div class="dec-sprint-col">
+      <div class="dec-sprint-col-h ${sprintColors[spi]}">${sp}</div>
+      <div class="dec-sprint-col-body">`;
+    tasks[spi].forEach((task,ti)=>{
+      h+=`<div class="dec-task" style="margin-bottom:4px">
+        <div class="dec-task-check ${task.done?'done':''}" onclick="togDecTask(${si},${mi},${spi},${ti});expandMonth(${si},${mi})"></div>
+        <div class="dec-task-text ${task.done?'done':''}" contenteditable="true" onblur="updDecTask(${si},${mi},${spi},${ti},this.textContent)">${esc(task.text)}</div>
+        <button class="dec-task-cal" onclick="addToGCal(${si},${mi},${spi},${ti})" title="Google Calendar">📅</button>
+        <button class="dec-task-rm" onclick="rmDecTask(${si},${mi},${spi},${ti});expandMonth(${si},${mi})">×</button>
+      </div>`;
+    });
+    h+=`<div class="irow" style="margin:6px 0 0"><input placeholder="+ Новая задача..." style="padding:6px 8px;font-size:11px" onkeydown="if(event.key==='Enter'){addDecTask(${si},${mi},${spi},this.value);this.value='';expandMonth(${si},${mi})}"></div>`;
+    h+=`</div></div>`;
+  });
+
+  h+=`</div>`;
+  h+=`<button class="dec-gcal-btn" onclick="syncMonthToGCal(${si},${mi})">📅 Синхронизировать весь месяц в Google Calendar</button>`;
+  h+=`</div>`;
+
+  const modal=document.getElementById('decExpandedModal');
+  modal.style.display='block';
+  modal.innerHTML=h;
+  modal.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function closeExpanded(){document.getElementById('decExpandedModal').style.display='none';renderDecomp()}
+
+function addDecTask(si,mi,spi,text){
+  text=text.trim();if(!text)return;
+  clientData.spheres[si].tasks[mi][spi].push({text,done:false});
+  save();
+}
+
+function togDecTask(si,mi,spi,ti){
+  clientData.spheres[si].tasks[mi][spi][ti].done=!clientData.spheres[si].tasks[mi][spi][ti].done;
+  save();renderDecomp();
+}
+
+function updDecTask(si,mi,spi,ti,text){
+  clientData.spheres[si].tasks[mi][spi][ti].text=text;save();
+}
+
+function rmDecTask(si,mi,spi,ti){
+  clientData.spheres[si].tasks[mi][spi].splice(ti,1);save();renderDecomp();
+}
+
+// ===== GOOGLE CALENDAR SYNC =====
+function addToGCal(si,mi,spi,ti){
+  const sph=clientData.spheres[si];
+  const task=sph.tasks[mi][spi][ti];
+  const year=new Date().getFullYear();
+  const month=mi+1;
+  // Approximate week start based on sprint
+  const weekStart=1+spi*7;
+  const day=Math.min(weekStart,28);
+  const dateStr=`${year}${String(month).padStart(2,'0')}${String(day).padStart(2,'0')}`;
+  const title=encodeURIComponent(`[${sph.name}] ${task.text}`);
+  const details=encodeURIComponent(`Сфера: ${sph.name}\nЦель месяца: ${sph.monthGoals[mi]}\nСпринт ${spi+1}`);
+  const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}`;
+  window.open(url,'_blank');
+  toast('Открыт Google Calendar');
+}
+
+function syncMonthToGCal(si,mi){
+  const sph=clientData.spheres[si];
+  const year=new Date().getFullYear();
+  const month=mi+1;
+  const allTasks=[];
+  sph.tasks[mi].forEach((sprint,spi)=>{
+    sprint.forEach(task=>{
+      if(!task.done){
+        const day=Math.min(1+spi*7,28);
+        allTasks.push({text:task.text,day,spi});
+      }
+    });
+  });
+  if(allTasks.length===0){toast('Нет незавершённых задач','rs');return}
+
+  // Open first task, show instructions for the rest
+  const first=allTasks[0];
+  const dateStr=`${year}${String(month).padStart(2,'0')}${String(first.day).padStart(2,'0')}`;
+  const title=encodeURIComponent(`[${sph.name}] ${first.text}`);
+  const allText=allTasks.map((t,i)=>`${i+1}. [Спринт ${t.spi+1}] ${t.text}`).join('\n');
+  const details=encodeURIComponent(`Сфера: ${sph.name}\nЦель: ${sph.monthGoals[mi]}\n\nВсе задачи месяца:\n${allText}`);
+  const url=`https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${dateStr}/${dateStr}&details=${details}`;
+  window.open(url,'_blank');
+  toast(`${allTasks.length} задач → Google Calendar`);
+}
+
+// ===== VALUES =====
+function renderValues(){
+  document.getElementById('p_values').innerHTML=`
+  <div class="pg-h"><h2>Карта ценностей</h2><p>Расставьте по приоритету</p></div>
+  <div class="pg-b">
+    <div class="tk">${clientData.values.map((v,i)=>`<div class="tk-i"><span class="tk-m" style="min-width:24px;color:var(--ac);font-weight:700">${String(i+1).padStart(2,'0')}</span>
+      <input value="${v}" placeholder="Ценность..." style="flex:1;background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:14px;outline:none" oninput="clientData.values[${i}]=this.value;save()">
+      <button class="tk-x" onclick="clientData.values.splice(${i},1);save();renderValues()">×</button></div>`).join('')}
+    </div>
+    <button class="btn btn-g" style="margin-top:10px" onclick="clientData.values.push('');save();renderValues()">+ Добавить</button>
+  </div>`;
+}
+
+// ===== TIME BLOCKS =====
+function renderTB(){
+  const today=new Date().toLocaleDateString('ru-RU');
+  const blocks=clientData.timeblocks.filter(b=>b.date===today).sort((a,b)=>a.time.localeCompare(b.time));
+  const cc={'Работа':'var(--ac)','Продукт':'var(--em)','Маркетинг':'var(--cr)','Обучение':'var(--gd)','Здоровье':'var(--em)','Семья':'var(--rs)'};
+  document.getElementById('p_tb').innerHTML=`
+  <div class="pg-h"><h2>Time Blocking</h2><p>Система Elon Musk</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--ac)">
+      <div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:6px">⚡ Как планирует Elon Musk</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Musk управляет Tesla, SpaceX, xAI, Neuralink и Boring Company одновременно. Его секрет — <b>каждые 5 минут дня заранее расписаны</b>. С 7 утра весь день разбит на блоки: встречи, инженерная работа, обед (5 минут!), время с детьми.
+        <br><br>
+        <b>Ключевой принцип:</b> <span style="color:var(--gd)">«Allocation Before Prioritization»</span> — сначала распределить время по областям жизни (работа, семья, здоровье), затем приоритизировать задачи внутри каждой. Похожие задачи группируются в один блок (батчинг) — это исключает переключение контекста.
+        <br><br>
+        <span style="color:var(--t3)">80% времени Musk тратит на инженерию и дизайн. Он работает 85-100 часов в неделю, но при этом проводит 4 дня в неделю с детьми — потому что это запланировано.</span>
+      </div>
+    </div>
+    <div class="irow">
+      <input id="tb_t" placeholder="Задача...">
+      <input id="tb_tm" type="time" value="09:00" style="max-width:110px">
+      <input id="tb_d" type="number" value="30" min="5" step="5" style="max-width:70px" placeholder="мин">
+      <select id="tb_c" style="max-width:120px"><option>Работа</option><option>Продукт</option><option>Маркетинг</option><option>Обучение</option><option>Здоровье</option><option>Семья</option></select>
+      <button class="btn btn-a" onclick="addTB()">+</button>
+    </div>
+    <div class="tk">${blocks.map(b=>`<div class="tk-i" style="border-left:3px solid ${cc[b.cat]||'var(--bd)'}">
+      <div class="tk-c ${b.done?'done':''}" onclick="togTB('${b.id}')"></div>
+      <span class="tk-t ${b.done?'dn':''}">${b.task}</span>
+      <span style="font-size:9px;padding:2px 7px;border-radius:99px;background:var(--bg3);color:var(--t4)">${b.cat}</span>
+      <span class="tk-m">${b.time} · ${b.dur}'</span>
+      <button class="tk-x" onclick="rmTB('${b.id}')">×</button></div>`).join('')||'<p style="color:var(--t4);font-size:12px;padding:10px">Добавьте первый блок на сегодня</p>'}
+    </div>
+  </div>`;
+}
+function addTB(){const t=document.getElementById('tb_t').value.trim();if(!t)return;
+  clientData.timeblocks.push({id:Date.now()+'',task:t,time:document.getElementById('tb_tm').value,dur:document.getElementById('tb_d').value,cat:document.getElementById('tb_c').value,date:new Date().toLocaleDateString('ru-RU'),done:false});
+  document.getElementById('tb_t').value='';save();renderTB();renderDash()}
+function togTB(id){const b=clientData.timeblocks.find(b=>b.id===id);if(b)b.done=!b.done;save();renderTB();renderDash()}
+function rmTB(id){clientData.timeblocks=clientData.timeblocks.filter(b=>b.id!==id);save();renderTB();renderDash()}
+
+// ===== DEEP WORK =====
+function renderDW(){
+  document.getElementById('p_dw').innerHTML=`
+  <div class="pg-h"><h2>Deep Work Timer</h2><p>Система Cal Newport</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--em)">
+      <div style="font-size:13px;font-weight:600;color:var(--em);margin-bottom:6px">◎ Как планирует Cal Newport</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Профессор Georgetown и автор бестселлера «Deep Work». Newport разделяет весь день на два режима: <b>глубокая работа</b> (утро, 3-4 часа без отвлечений — никаких email, мессенджеров, звонков) и <b>мелкая работа</b> (после обеда — рутина, переписка, звонки).
+        <br><br>
+        <b>Ключевой принцип:</b> <span style="color:var(--gd)">«Глубокая работа — это навык, не привычка. Его нужно тренировать как мышцу.»</span> Начните с 25 минут без отвлечений и постепенно доведите до 3-4 часов.
+        <br><br>
+        <span style="color:var(--t3)">Newport планирует на бумаге, не в приложениях. Пересматривает план 2-3 раза в день. Заканчивает работу строго в одно и то же время каждый день — это его «ритуал завершения».</span>
+      </div>
+    </div>
+    <div class="tmr"><div class="tmr-c" id="tc"><div class="tmr-t" id="td">25:00</div><div class="tmr-l">Deep Work</div></div>
+      <div class="tmr-btns"><button class="tmr-b" id="tsb" onclick="togTmr()">▶</button><button class="tmr-b" onclick="rstTmr()">■</button></div>
+      <div class="presets"><button class="pre on" onclick="setPre(25,this)">25'</button><button class="pre" onclick="setPre(50,this)">50'</button><button class="pre" onclick="setPre(90,this)">90'</button><button class="pre" onclick="setPre(120,this)">2ч</button></div>
+    </div>
+    <div class="g3"><div class="cd em"><div class="cd-t">Сессий</div><div class="cd-v">${clientData.deepwork.sessions}</div></div>
+      <div class="cd ac"><div class="cd-t">Минут</div><div class="cd-v">${clientData.deepwork.minutes}</div></div>
+      <div class="cd gd"><div class="cd-t">Серия дней</div><div class="cd-v">${clientData.deepwork.streak}</div></div></div>
+  </div>`;
+}
+function togTmr(){if(timerOn){clearInterval(timerInt);timerOn=false;document.getElementById('tc').className='tmr-c ps';document.getElementById('tsb').textContent='▶'}
+  else{timerOn=true;document.getElementById('tc').className='tmr-c on';document.getElementById('tsb').textContent='⏸';
+    timerInt=setInterval(()=>{timerSec--;if(timerSec<=0){clearInterval(timerInt);timerOn=false;
+      clientData.deepwork.sessions++;clientData.deepwork.minutes+=timerPre;
+      const td=new Date().toLocaleDateString('ru-RU');if(clientData.deepwork.lastDate!==td){clientData.deepwork.streak++;clientData.deepwork.lastDate=td}
+      save();rstTmr();renderDW();renderDash();toast('Deep Work завершён!');return}
+    const m=Math.floor(timerSec/60),s=timerSec%60;document.getElementById('td').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`},1000)}}
+function rstTmr(){clearInterval(timerInt);timerOn=false;timerSec=timerPre*60;
+  if(document.getElementById('tc'))document.getElementById('tc').className='tmr-c';
+  if(document.getElementById('tsb'))document.getElementById('tsb').textContent='▶';
+  if(document.getElementById('td')){const m=Math.floor(timerSec/60),s=timerSec%60;document.getElementById('td').textContent=`${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`}}
+function setPre(min,el){document.querySelectorAll('.pre').forEach(p=>p.classList.remove('on'));el.classList.add('on');timerPre=min;rstTmr()}
+
+// ===== JOURNAL =====
+function renderJournal(){
+  document.getElementById('p_journal').innerHTML=`
+  <div class="pg-h"><h2>Журнал рефлексии</h2><p>Система Sara Blakely</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--gd)">
+      <div style="font-size:13px;font-weight:600;color:var(--gd);margin-bottom:6px">✎ Как планирует Sara Blakely</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Основательница Spanx, первая женщина-миллиардер, которая заработала состояние сама. Blakely ведёт журнал с 20+ тетрадями, в которых записывает <b>всё плохое, что произошло, и дар, который из этого вырос</b>.
+        <br><br>
+        <b>Ключевой принцип:</b> <span style="color:var(--gd)">«Каждая проблема содержит скрытую возможность.»</span> Её отец каждый вечер спрашивал: «Что у тебя сегодня НЕ получилось?» — и радовался, когда дочь пробовала и ошибалась.
+        <br><br>
+        <span style="color:var(--t3)">Также каждое утро она генерирует 10 идей (любых). Не оценивает качество — важен объём. Это тренирует «мышцу идей». Раз в неделю просматривает журнал и выбирает 1 идею для реализации.</span>
+      </div>
+    </div>
+    <div style="margin-bottom:12px"><label style="font-size:11px;color:var(--t4);display:block;margin-bottom:4px">Что произошло? (проблемы, вызовы)</label><textarea class="jta" id="j_p" placeholder="Опишите, что пошло не так сегодня..."></textarea></div>
+    <div style="margin-bottom:12px"><label style="font-size:11px;color:var(--t4);display:block;margin-bottom:4px">Какой дар / урок скрыт в этом?</label><textarea class="jta" id="j_g" placeholder="Какую возможность вы видите в этой проблеме?"></textarea></div>
+    <button class="btn btn-a" onclick="addJ()">Сохранить запись</button>
+    <div style="margin-top:20px">${clientData.journal.slice(0,15).map(j=>`<div class="je"><div class="je-d">${j.date}</div>
+      <div style="color:var(--rs);font-size:11px;font-weight:600;margin-bottom:2px">Проблема:</div><div class="je-t">${j.pain}</div>
+      ${j.gift?`<div style="color:var(--em);font-size:11px;font-weight:600;margin:6px 0 2px">Дар:</div><div class="je-t">${j.gift}</div>`:''}</div>`).join('')}</div>
+  </div>`;
+}
+function addJ(){const p=document.getElementById('j_p').value.trim();if(!p)return;
+  clientData.journal.unshift({date:new Date().toLocaleDateString('ru-RU'),pain:p,gift:document.getElementById('j_g').value.trim()});
+  save();renderJournal();renderDash();toast('Запись сохранена')}
+
+// ===== PAIN LOG =====
+function renderPain(){
+  document.getElementById('p_pain').innerHTML=`
+  <div class="pg-h"><h2>Pain Log</h2><p>Система Ray Dalio</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--rs)">
+      <div style="font-size:13px;font-weight:600;color:var(--rs);margin-bottom:6px">⚡ Как планирует Ray Dalio</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Основатель Bridgewater Associates — крупнейшего хедж-фонда в мире ($150 млрд под управлением). Dalio создал систему, в которой <b>каждая ошибка любого сотрудника логируется публично</b>. Затем — анализ корневой причины (метод «5 Почему»). Из каждой ошибки формулируется принцип.
+        <br><br>
+        <b>Ключевой принцип:</b> <span style="color:var(--rs)">«Pain + Reflection = Progress»</span> (Боль + Рефлексия = Прогресс). Без системы фиксации ошибок вы обречены их повторять. Библиотека принципов — это ваша «операционная система» жизни.
+        <br><br>
+        <span style="color:var(--t3)">Dalio изучает циклы истории за сотни лет, чтобы принимать решения. Его книга «Principles» — результат 40 лет ведения такого лога.</span>
+      </div>
+    </div>
+    <div class="irow"><input id="pl_w" placeholder="Что пошло не так?"><input id="pl_y" placeholder="Корневая причина (5 Почему)..."><button class="btn btn-a" onclick="addPL()">+ Записать</button></div>
+    <div class="tk">${clientData.painlog.map((p,i)=>`<div class="tk-i" style="border-left:3px solid ${p.resolved?'var(--em)':'var(--rs)'}">
+      <div class="tk-c ${p.resolved?'done':''}" onclick="clientData.painlog[${i}].resolved=!clientData.painlog[${i}].resolved;save();renderPain()"></div>
+      <div style="flex:1"><div class="tk-t">${p.what}</div>${p.why?`<div style="font-size:10px;color:var(--t4);margin-top:1px">${p.why}</div>`:''}</div>
+      <span class="tk-m">${p.date}</span></div>`).join('')}</div>
+  </div>`;
+}
+function addPL(){const w=document.getElementById('pl_w').value.trim();if(!w)return;
+  clientData.painlog.unshift({date:new Date().toLocaleDateString('ru-RU'),what:w,why:document.getElementById('pl_y').value.trim(),resolved:false});
+  document.getElementById('pl_w').value='';document.getElementById('pl_y').value='';save();renderPain();toast('Записано')}
+
+// ===== PRINCIPLES =====
+function renderPrinc(){
+  document.getElementById('p_princ').innerHTML=`
+  <div class="pg-h"><h2>Библиотека принципов</h2><p>Система Ray Dalio</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--gd)">
+      <div style="font-size:13px;font-weight:600;color:var(--gd);margin-bottom:6px">◆ Библиотека принципов Dalio</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        У Dalio более 200 принципов, сформулированных за 40 лет работы. Каждый принцип родился из конкретной ошибки, зафиксированной в Pain Log. Принципы — это <b>закодированный опыт</b>: правила, которые помогают не повторять ошибки и принимать решения быстрее.
+        <br><br>
+        <b>Как это работает:</b> <span style="color:var(--gd)">Ошибка → Pain Log → Анализ «5 Почему» → Формулировка принципа → Добавление в библиотеку.</span> Перед каждым важным решением — сверяетесь с библиотекой.
+      </div>
+    </div>
+    <div class="irow"><input id="pr_t" placeholder="Название принципа..." style="max-width:260px"><input id="pr_b" placeholder="Формулировка принципа..."><button class="btn btn-a" onclick="addPR()">+ Добавить</button></div>
+    ${clientData.principles.map(p=>`<div class="prc"><div class="prc-t">${p.title}</div><div class="prc-d">${p.date}</div><div class="prc-b">${p.body}</div></div>`).join('')||'<p style="color:var(--t4);font-size:12px">Пока нет принципов. Начните с Pain Log — формулируйте принципы из ошибок.</p>'}
+  </div>`;
+}
+function addPR(){const t=document.getElementById('pr_t').value.trim(),b=document.getElementById('pr_b').value.trim();if(!t||!b)return;
+  clientData.principles.unshift({title:t,body:b,date:new Date().toLocaleDateString('ru-RU')});
+  document.getElementById('pr_t').value='';document.getElementById('pr_b').value='';save();renderPrinc();renderDash();toast('Принцип добавлен')}
+
+// ===== PRIORITIES =====
+function renderPrior(){
+  document.getElementById('p_prior').innerHTML=`
+  <div class="pg-h"><h2>5 Главных приоритетов</h2><p>Система Warren Buffett</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px;margin-bottom:20px;border-left:4px solid var(--cr)">
+      <div style="font-size:13px;font-weight:600;color:var(--cr);margin-bottom:6px">★ Как планирует Warren Buffett</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.7">
+        Легендарный инвестор, состояние $130+ млрд. Управляет 65+ компаниями через Berkshire Hathaway. При этом его календарь <b>почти пуст</b> — 3-4 встречи в МЕСЯЦ. Его друг Bill Gates заметил: <i style="color:var(--t3)">«У него бывают дни, когда в расписании вообще ничего нет.»</i>
+        <br><br>
+        <b>Ключевой принцип:</b> <span style="color:var(--cr)">«Различие между успешными и по-настоящему успешными людьми в том, что по-настоящему успешные говорят НЕТ почти всему.»</span>
+        <br><br>
+        Buffett тратит <b>80% дня на чтение и размышления</b> — 6 газет ежедневно, около 500 страниц в неделю. Он называет это compound learning: знания накапливаются как сложный процент. <span style="color:var(--t3)">Миф про «правило 25/5» был опровергнут самим Баффетом, но его реальный совет ещё радикальнее: определите 5 вещей и забудьте про всё остальное.</span>
+      </div>
+    </div>
+    ${clientData.priorities.map((p,i)=>`<div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+      <span style="font-family:var(--fm);font-size:22px;font-weight:700;color:var(--ac);min-width:32px">${i+1}</span>
+      <input value="${p}" placeholder="Приоритет ${i+1}..." style="flex:1;padding:13px 16px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2);color:var(--t1);font-family:var(--fb);font-size:14px;outline:none" oninput="clientData.priorities[${i}]=this.value;save()">
+    </div>`).join('')}
+    <div style="margin-top:20px;padding:18px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);border-left:4px solid var(--rs)">
+      <div style="font-size:13px;font-weight:600;color:var(--rs);margin-bottom:4px">Зона «НЕТ»</div>
+      <div style="font-size:12px;color:var(--t3);line-height:1.5">Всё, что не входит в 5 приоритетов — активно избегайте. Не откладывайте на «потом». Вычёркивайте. Это не «может быть позже» — это «никогда».</div></div>
+  </div>`;
+}
+
+// ===== HEALTH =====
+function renderHealth(){
+  const d=clientData;
+  const yes=d.health.filter(h=>h===true).length,no=d.health.filter(h=>h===false).length,ans=yes+no;
+  const sc=ans?Math.round(yes/ans*100):0;
+  let col='var(--t4)',lbl='—',adv='Нажимайте для ответа';
+  if(ans&&sc>=80){col='var(--em)';lbl=sc+'%';adv='Отличный фундамент'}
+  else if(ans&&sc>=50){col='var(--gd)';lbl=sc+'%';adv='Есть зоны роста'}
+  else if(ans){col='var(--rs)';lbl=sc+'%';adv='Требуется внимание'}
+  document.getElementById('p_health').innerHTML=`
+  <div class="pg-h"><h2>Диагностика</h2><p>Нажимайте для переключения Да / Нет</p></div>
+  <div class="pg-b">
+    <div class="hg">${healthQ.map((q,i)=>{const s=d.health[i];return`<div class="hi ${s===true?'yes':s===false?'no':''}" onclick="togH(${i},this)"><div class="hc"></div><div class="hl">${q}</div></div>`}).join('')}</div>
+    <div style="margin-top:16px;display:flex;align-items:center;gap:20px;padding:20px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r)">
+      <div style="width:70px;height:70px;border-radius:50%;border:3px solid ${col};display:flex;align-items:center;justify-content:center;font-family:var(--fm);font-size:22px;font-weight:700;color:${col}">${lbl}</div>
+      <div><div style="font-size:14px;font-weight:600;color:${col}">${adv}</div><div style="font-size:12px;color:var(--t3);margin-top:2px">Да: ${yes} | Нет: ${no}</div></div></div>
+  </div>`;
+}
+function togH(i,el){if(clientData.health[i]===true)clientData.health[i]=false;else if(clientData.health[i]===false)clientData.health[i]=null;else clientData.health[i]=true;save();renderHealth()}
+
+// ===== BELIEFS =====
+function renderBeliefs(){
+  const b=clientData.beliefs;
+  document.getElementById('p_beliefs').innerHTML=`
+  <div class="pg-h"><h2>Работа с убеждениями</h2><p>Честные ответы — основа трансформации</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:22px">
+      <div style="margin-bottom:14px"><label style="font-size:11px;color:var(--t4);display:block;margin-bottom:4px">Чего я давно хочу достигнуть, но не достиг?</label>
+        <textarea class="jta" oninput="clientData.beliefs.want=this.value;save()">${b.want}</textarea></div>
+      <div style="margin-bottom:14px"><label style="font-size:11px;color:var(--t4);display:block;margin-bottom:4px">Найдите 10 выгод, почему вам выгодно этого НЕ достичь</label>
+        <textarea class="jta" style="min-height:160px" placeholder="1.\n2.\n3.\n4.\n5.\n6.\n7.\n8.\n9.\n10." oninput="clientData.beliefs.benefits=this.value;save()">${b.benefits}</textarea></div>
+      <div style="margin-bottom:14px"><label style="font-size:11px;color:var(--t4);display:block;margin-bottom:4px">Какое ограничивающее убеждение привело вас к этому результату?</label>
+        <textarea class="jta" placeholder="Например: «Я не заслуживаю...», «У меня не получится...»" oninput="clientData.beliefs.limiting=this.value;save()">${b.limiting}</textarea></div>
+    </div>
+  </div>`;
+}
+
+// ===== ASSIGNMENTS (from coach) =====
+function renderAssignments(){
+  if(!clientData.assignments) clientData.assignments=[];
+  // Ensure Pleasantville is always the first assignment if not present
+  const hasPV=clientData.assignments.some(a=>a.id==='pleasantville');
+  if(!hasPV){
+    clientData.assignments.unshift({
+      id:'pleasantville',
+      title:'Плезантвиль — рефлексия после фильма',
+      description:'Посмотрите фильм «Плезантвиль» (1998). Ответьте на вопросы ниже. Условия: отвечайте с учётом предыдущего вопроса и своего ответа. Нет неправильных ответов. Отлавливайте свои ощущения при озвучивании ответов.',
+      type:'questions',
+      questions:[
+        {q:'Что такое Плезантвиль?',key:'pv_q1'},
+        {q:'Почему фильм назвали Плезантвилем?',key:'pv_q2'},
+        {q:'В чём метафора Плезантвиля в реальной жизни?',key:'pv_q3'},
+        {q:'Где Плезантвиль находится в реальной жизни?',key:'pv_q4'},
+        {q:'Сколько Плезантвилей было в фильме?',key:'pv_q5'},
+        {q:'В чём метафора города? Почему не показали отдельных людей, а целый город?',key:'pv_q6'},
+        {q:'В чём метафора мелких деталей (попадай мячом в корзину и т.д.)?',key:'pv_q7'},
+        {q:'Почему девочка осталась в Плезантвиле?',key:'pv_q8'},
+        {q:'Можно ли выйти из Плезантвиля?',key:'pv_q9'},
+        {q:'В чём ваш Плезантвиль сейчас?',key:'pv_q10'},
+      ],
+      fromCoach:true, createdAt:new Date().toISOString()
+    });
+    save();
+  }
+
+  // Initialize answer storage
+  if(!clientData.assignmentAnswers) clientData.assignmentAnswers={};
+
+  let h=`<div class="pg-h"><h2>Задания от Анастасии</h2><p>Психологические задания и упражнения от вашего коуча</p></div><div class="pg-b">`;
+
+  clientData.assignments.forEach((a,ai)=>{
+    const isOpen=document.getElementById('p_assignments')?.querySelector(`[data-aid="${a.id}"].open`);
+    h+=`<div class="dec-sphere ${isOpen?'open':''}" data-aid="${a.id}">
+      <div class="dec-sphere-h" onclick="this.parentElement.classList.toggle('open')">
+        <div class="dec-sphere-left">
+          <div style="width:32px;height:32px;border-radius:var(--r2);background:var(--ac3);display:flex;align-items:center;justify-content:center;font-size:14px">📋</div>
+          <div><div class="dec-sphere-name">${a.title}</div>
+            <div class="dec-sphere-goal">${a.description?.slice(0,80)||''}...</div></div>
+        </div><div class="dec-sphere-arrow">▼</div>
+      </div>
+      <div class="dec-sphere-body" style="padding:18px">`;
+
+    if(a.description){
+      h+=`<div style="font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:16px;padding:14px;background:var(--bg3);border-radius:var(--r2);border-left:3px solid var(--ac)">${a.description}</div>`;
+    }
+
+    if(a.type==='questions' && a.questions){
+      a.questions.forEach((q,qi)=>{
+        const ans=clientData.assignmentAnswers[q.key]||'';
+        h+=`<div style="margin-bottom:14px">
+          <label style="font-size:12px;font-weight:600;color:var(--t1);display:flex;align-items:baseline;gap:8px;margin-bottom:6px">
+            <span style="font-family:var(--fm);font-size:10px;color:var(--ac);background:var(--ac3);padding:2px 7px;border-radius:99px">${qi+1}</span>${q.q}
+          </label>
+          <textarea class="jta" style="min-height:${qi===a.questions.length-1?'100px':'60px'}${qi===a.questions.length-1?';border-color:var(--ac)':''}" 
+            placeholder="Ваш ответ..." oninput="if(!clientData.assignmentAnswers)clientData.assignmentAnswers={};clientData.assignmentAnswers['${q.key}']=this.value;save()">${ans}</textarea>
+        </div>`;
+      });
+    }
+
+    if(a.type==='text'){
+      const ans=clientData.assignmentAnswers[a.id+'_answer']||'';
+      h+=`<textarea class="jta" style="min-height:120px" placeholder="Ваш ответ..." oninput="if(!clientData.assignmentAnswers)clientData.assignmentAnswers={};clientData.assignmentAnswers['${a.id}_answer']=this.value;save()">${ans}</textarea>`;
+    }
+
+    h+=`</div></div>`;
+  });
+
+  h+=`</div>`;
+  document.getElementById('p_assignments').innerHTML=h;
+}
+
+// ===== BACKLOG =====
+function renderBacklog(){
+  // Collect ALL tasks from ALL spheres, ALL months, ALL sprints into one flat list
+  const allTasks=[];
+  clientData.spheres.forEach((sph,si)=>{
+    sph.tasks.forEach((sprints,mi)=>{
+      sprints.forEach((sprint,spi)=>{
+        sprint.forEach((task,ti)=>{
+          allTasks.push({
+            sphere:sph.name, month:months[mi], sprint:spi+1,
+            text:task.text, done:task.done,
+            si,mi,spi,ti
+          });
+        });
+      });
+    });
+  });
+
+  const pending=allTasks.filter(t=>!t.done);
+  const completed=allTasks.filter(t=>t.done);
+
+  let h=`<div class="pg-h"><h2>Backlog</h2><p>Все задачи из всех спринтов в одном месте — ${pending.length} в работе, ${completed.length} выполнено</p></div><div class="pg-b">`;
+
+  // Filter controls
+  h+=`<div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap">
+    <button class="pre on" onclick="filterBacklog('all',this)">Все (${allTasks.length})</button>
+    <button class="pre" onclick="filterBacklog('pending',this)">В работе (${pending.length})</button>
+    <button class="pre" onclick="filterBacklog('done',this)">Выполнено (${completed.length})</button>
+  </div>`;
+
+  // Group by sphere
+  const sphereNames=[...new Set(allTasks.map(t=>t.sphere))];
+
+  sphereNames.forEach(sn=>{
+    const sphereTasks=allTasks.filter(t=>t.sphere===sn);
+    if(sphereTasks.length===0)return;
+    const sDone=sphereTasks.filter(t=>t.done).length;
+
+    h+=`<div style="margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div style="font-size:13px;font-weight:600">${sn}</div>
+        <div style="font-family:var(--fm);font-size:11px;color:${sDone===sphereTasks.length?'var(--em)':'var(--t4)'}">${sDone}/${sphereTasks.length}</div>
+      </div>
+      <div class="tk" data-backlog-sphere="${sn}">`;
+
+    sphereTasks.forEach(t=>{
+      const sprintColors=['var(--ac)','var(--em)','var(--gd)','var(--rs)'];
+      h+=`<div class="tk-i backlog-item ${t.done?'backlog-done':'backlog-pending'}" style="border-left:3px solid ${sprintColors[t.spi]}">
+        <div class="tk-c ${t.done?'done':''}" onclick="togDecTask(${t.si},${t.mi},${t.spi},${t.ti});renderBacklog();renderDecomp()"></div>
+        <div style="flex:1">
+          <div class="tk-t ${t.done?'dn':''}">${esc(t.text)}</div>
+          <div style="font-size:9px;color:var(--t4);margin-top:1px">${t.month} · Спринт ${t.sprint}</div>
+        </div>
+        <button class="dec-task-cal" onclick="addToGCal(${t.si},${t.mi},${t.spi},${t.ti})" title="Google Calendar">📅</button>
+      </div>`;
+    });
+
+    h+=`</div></div>`;
+  });
+
+  if(allTasks.length===0) h+=`<p style="color:var(--t4);font-size:13px">Нет задач. Добавьте их в Декомпозиции → раскройте месяц → добавьте задачи в спринты.</p>`;
+  h+=`</div>`;
+  document.getElementById('p_backlog').innerHTML=h;
+}
+
+function filterBacklog(filter,btn){
+  document.querySelectorAll('.pg-b .pre').forEach(p=>p.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.backlog-item').forEach(el=>{
+    if(filter==='all') el.style.display='';
+    else if(filter==='pending') el.style.display=el.classList.contains('backlog-pending')?'':'none';
+    else el.style.display=el.classList.contains('backlog-done')?'':'none';
+  });
+}
+
+// ===== FINANCE / SESSIONS =====
+function renderFinance(){
+  if(!clientData.finance) clientData.finance={tariff:'',totalSessions:0,totalPrice:0,minutesPerSession:60,sessions:[],payments:[],zoomLink:''};
+  if(!clientData.finance.minutesPerSession) clientData.finance.minutesPerSession=60;
+  const f=clientData.finance;
+  const pricePerSession=f.totalSessions>0?Math.round(f.totalPrice/f.totalSessions):0;
+  const mps=parseInt(f.minutesPerSession)||60;
+  const pricePerMinute=f.totalSessions>0?Math.round(f.totalPrice/(f.totalSessions*mps)*100)/100:0;
+
+  const totalMinutesUsed=f.sessions.reduce((s,se)=>s+(parseInt(se.minutes)||0),0);
+  const totalMinutesBought=f.totalSessions*mps;
+  const sessionsUsed=f.sessions.length;
+  const sessionsLeft=Math.max(0,f.totalSessions-sessionsUsed);
+  const minutesLeft=Math.max(0,totalMinutesBought-totalMinutesUsed);
+  const totalPaid=f.payments.reduce((s,p)=>s+(parseFloat(p.amount)||0),0);
+  const debt=Math.max(0,f.totalPrice-totalPaid);
+  const moneyUsed=Math.round(totalMinutesUsed*pricePerMinute);
+  const moneyLeft=Math.max(0,f.totalPrice-moneyUsed);
+
+  let h=`<div class="pg-h"><h2>Сессии и оплаты</h2><p>Учёт консультаций, расчёт остатков</p></div><div class="pg-b">`;
+
+  // Tariff settings
+  h+=`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:20px">
+    <div style="font-size:13px;font-weight:600;color:var(--ac);margin-bottom:12px">⚙️ Настройки тарифа</div>
+    <div class="g4" style="gap:10px">
+      <div><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Название тарифа</div>
+        <input value="${esc(f.tariff)}" placeholder="Пакет 20 сессий" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" onchange="clientData.finance.tariff=this.value;save()"></div>
+      <div><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Кол-во сессий</div>
+        <input type="number" value="${f.totalSessions||''}" placeholder="20" min="0" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" onchange="clientData.finance.totalSessions=parseInt(this.value)||0;save();renderFinance()"></div>
+      <div><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Минут в сессии</div>
+        <input type="number" value="${f.minutesPerSession||60}" placeholder="60" min="1" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" onchange="clientData.finance.minutesPerSession=parseInt(this.value)||60;save();renderFinance()"></div>
+      <div><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Общая стоимость ₽</div>
+        <input type="number" value="${f.totalPrice||''}" placeholder="250000" min="0" style="width:100%;padding:9px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" onchange="clientData.finance.totalPrice=parseFloat(this.value)||0;save();renderFinance()"></div>
+    </div>
+    ${f.totalSessions>0?`<div style="display:flex;gap:20px;margin-top:12px;padding-top:12px;border-top:1px solid var(--bd)">
+      <div style="font-size:11px;color:var(--t3)">За сессию: <b style="color:var(--ac);font-family:var(--fm)">${pricePerSession.toLocaleString('ru-RU')} ₽</b></div>
+      <div style="font-size:11px;color:var(--t3)">За минуту: <b style="color:var(--ac);font-family:var(--fm)">${pricePerMinute} ₽</b></div>
+      <div style="font-size:11px;color:var(--t3)">Всего минут: <b style="color:var(--em);font-family:var(--fm)">${totalMinutesBought}</b></div>
+    </div>`:''}
+  </div>`;
+
+  // Stats cards
+  h+=`<div class="g4" style="margin-bottom:20px">
+    <div class="cd ac"><div class="cd-t">Сессий осталось</div><div class="cd-v">${sessionsLeft}</div><div class="cd-s">из ${f.totalSessions}</div></div>
+    <div class="cd em"><div class="cd-t">Минут осталось</div><div class="cd-v">${minutesLeft}</div><div class="cd-s">из ${totalMinutesBought}</div></div>
+    <div class="cd ${debt>0?'rs':'gd'}"><div class="cd-t">${debt>0?'Долг':'Оплачено'}</div><div class="cd-v">${debt>0?debt.toLocaleString('ru-RU'):totalPaid.toLocaleString('ru-RU')}</div><div class="cd-s">${debt>0?'₽ к оплате':'₽ полностью'}</div></div>
+    <div class="cd gd"><div class="cd-t">Остаток средств</div><div class="cd-v">${moneyLeft.toLocaleString('ru-RU')}</div><div class="cd-s">₽</div></div>
+  </div>`;
+
+  // Sessions log
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
+    <div style="font-size:15px;font-weight:600">Журнал сессий</div>
+    <button class="btn btn-a" onclick="addFinSession()">+ Добавить сессию</button>
+  </div>`;
+
+  h+=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;font-size:12px">
+    <thead><tr style="background:var(--bg3)">
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--bd)">№</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Дата</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Время (МСК)</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Минут</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Стоимость</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Ост. минут</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Ост. ₽</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Запись</th>
+      <th style="padding:10px 8px;border-bottom:1px solid var(--bd);width:30px"></th>
+    </tr></thead><tbody>`;
+
+  let runningMinutes=totalMinutesBought;
+  let runningMoney=f.totalPrice;
+  f.sessions.forEach((se,i)=>{
+    const mins=parseInt(se.minutes)||0;
+    const cost=Math.round(mins*pricePerMinute);
+    runningMinutes-=mins;
+    runningMoney-=cost;
+    h+=`<tr style="background:var(--bg2);border-bottom:1px solid rgba(42,42,56,.4)">
+      <td style="padding:8px 12px;color:var(--t4);font-family:var(--fm)">${i+1}</td>
+      <td style="padding:8px 12px"><input type="date" value="${se.date||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none" onchange="clientData.finance.sessions[${i}].date=this.value;save()"></td>
+      <td style="padding:8px 12px"><input type="time" value="${se.time||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none;width:80px" onchange="clientData.finance.sessions[${i}].time=this.value;save()"></td>
+      <td style="padding:8px 12px"><input type="number" value="${se.minutes||''}" placeholder="60" min="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--gd);font-family:var(--fm);font-size:12px;outline:none;width:60px;padding:3px 6px;text-align:center" oninput="clientData.finance.sessions[${i}].minutes=this.value;saveFin()"></td>
+      <td style="padding:8px 12px;font-family:var(--fm);color:var(--t2)">${cost.toLocaleString('ru-RU')} ₽</td>
+      <td style="padding:8px 12px;font-family:var(--fm);color:${runningMinutes<0?'var(--rs)':'var(--em)'}">${runningMinutes}</td>
+      <td style="padding:8px 12px;font-family:var(--fm);color:${runningMoney<0?'var(--rs)':'var(--em)'}">${Math.round(runningMoney).toLocaleString('ru-RU')}</td>
+      <td style="padding:8px 12px"><input value="${esc(se.recordLink||'')}" placeholder="Ссылка на запись..." style="background:transparent;border:none;color:var(--bl);font-size:11px;outline:none;width:120px;text-decoration:underline" oninput="clientData.finance.sessions[${i}].recordLink=this.value;save()"></td>
+      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.sessions.splice(${i},1);saveFin()">×</button></td>
+    </tr>`;
+  });
+
+  h+=`</tbody></table></div>`;
+
+  // Payments section
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin:28px 0 10px">
+    <div style="font-size:15px;font-weight:600">Оплаты</div>
+    <button class="btn btn-a" onclick="addFinPayment()">+ Добавить оплату</button>
+  </div>`;
+
+  h+=`<div style="overflow-x:auto"><table style="width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;font-size:12px">
+    <thead><tr style="background:var(--bg3)">
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">№</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Дата</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Сумма</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Комментарий</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Накопительно</th>
+      <th style="padding:10px 12px;text-align:left;font-size:10px;font-weight:600;color:var(--t4);text-transform:uppercase;border-bottom:1px solid var(--bd)">Остаток долга</th>
+      <th style="padding:10px 8px;border-bottom:1px solid var(--bd);width:30px"></th>
+    </tr></thead><tbody>`;
+
+  let runningPaid=0;
+  f.payments.forEach((p,i)=>{
+    const amt=parseFloat(p.amount)||0;
+    runningPaid+=amt;
+    const remainingDebt=Math.max(0,f.totalPrice-runningPaid);
+    h+=`<tr style="background:var(--bg2)">
+      <td style="padding:8px 12px;color:var(--t4);font-family:var(--fm)">${i+1}</td>
+      <td style="padding:8px 12px"><input type="date" value="${p.date||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none" onchange="clientData.finance.payments[${i}].date=this.value;save()"></td>
+      <td style="padding:8px 12px"><input type="number" value="${p.amount||''}" placeholder="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--em);font-family:var(--fm);font-size:12px;outline:none;width:100px;padding:3px 6px;text-align:center" oninput="clientData.finance.payments[${i}].amount=this.value;saveFin()"> ₽</td>
+      <td style="padding:8px 12px"><input value="${esc(p.comment||'')}" placeholder="Комментарий..." style="background:transparent;border:none;color:var(--t2);font-size:12px;outline:none;width:150px" oninput="clientData.finance.payments[${i}].comment=this.value;save()"></td>
+      <td style="padding:8px 12px;font-family:var(--fm);color:var(--em)">${runningPaid.toLocaleString('ru-RU')} ₽</td>
+      <td style="padding:8px 12px;font-family:var(--fm);color:${remainingDebt>0?'var(--rs)':'var(--em)'}">${remainingDebt>0?remainingDebt.toLocaleString('ru-RU')+' ₽':'Оплачено ✓'}</td>
+      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.payments.splice(${i},1);saveFin()">×</button></td>
+    </tr>`;
+  });
+  h+=`</tbody></table></div>`;
+
+  // Zoom link
+  h+=`<div style="margin-top:24px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px">
+    <div style="font-size:13px;font-weight:600;margin-bottom:8px">🔗 Ссылка на Zoom-сессию</div>
+    <input value="${esc(f.zoomLink||'')}" placeholder="https://zoom.us/j/..." style="width:100%;padding:10px 14px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r2);color:var(--bl);font-family:var(--fb);font-size:13px;outline:none;text-decoration:underline" oninput="clientData.finance.zoomLink=this.value;save()">
+    ${f.zoomLink?`<a href="${f.zoomLink}" target="_blank" style="display:inline-flex;align-items:center;gap:6px;margin-top:8px;padding:7px 14px;border-radius:99px;background:var(--bl2);border:1px solid rgba(96,165,250,.3);color:var(--bl);font-size:12px;font-weight:600;text-decoration:none">▶ Открыть Zoom</a>`:''}
+  </div>`;
+
+  h+=`</div>`;
+  document.getElementById('p_finance').innerHTML=h;
+}
+
+function addFinSession(){
+  if(!clientData.finance.sessions) clientData.finance.sessions=[];
+  clientData.finance.sessions.push({date:'',time:'',minutes:'',recordLink:''});
+  saveFin();
+}
+
+function addFinPayment(){
+  if(!clientData.finance.payments) clientData.finance.payments=[];
+  clientData.finance.payments.push({date:'',amount:'',comment:''});
+  saveFin();
+}
+
+// ===== TARIFFS =====
+function renderTariffs(){
+  const tariffs=[
+    {id:'t1',name:'Стартовый',price:'55 000',sessions:4,mins:40,desc:'Знакомство, принцип работы. Выделяем приоритетные цели, отцифровываем точку А, определяем истинные ценности, разбираем как работает мозг при принятии решений.',note:'Только для новых клиентов',popular:false,installments:0},
+    {id:'t2',name:'Годовая декомпозиция',price:'85 000',sessions:7,mins:40,desc:'Прежде чем выходить на полноценную работу — необходимо составить чёткий план. Построите в Miro полноценное годовое планирование, заполните календарь ключевыми действиями.',note:'',popular:false,installments:0},
+    {id:'t3',name:'Спринт',price:'450 000',sessions:0,mins:0,desc:'В формате спринта выбираете цель из декомпозиции и доводите до результата совместно с Анастасией. 100% гарантия достижения поставленной цели.',note:'100% гарантия результата',popular:false,installments:0},
+    {id:'t4',name:'Пакет 20 сессий',price:'250 000',sessions:20,mins:40,desc:'Индивидуальная система задач, трекинг привычек, работа с саботажем, делегирование, масштаб.',note:'Оплату можно разбить на 2 части',popular:true,installments:2},
+    {id:'t5',name:'Пакет 52 сессии',price:'660 400',sessions:52,mins:60,desc:'Вся программа + работа личного ассистента, который помогает быстро внедрять всё с коучинга.',note:'Включён бизнес-ассистент',popular:false,installments:3},
+    {id:'t6',name:'Пакет 96 сессий',price:'960 000',sessions:96,mins:60,desc:'Полная трансформация: от орг.структуры до 10-летней стратегии. Включён личный ассистент.',note:'Рассрочка до 6 частей',popular:false,installments:6},
+  ];
+
+  const extras=[
+    {name:'Индивидуальный трекинг',price:'15 000 ₽/мес',desc:'Трекер напоминает о задачах, ведёт календарь, напоминает о занятиях, проверяет ДЗ.'},
+    {name:'Бизнес-ассистент',price:'35 000 ₽/мес',desc:'Создаёт шаблоны, помогает в найме, рассчитывает бизнес-модели, сводит данные.'},
+  ];
+
+  let h=`<div class="pg-h"><h2>🥥 Тарифы</h2><p>Выберите подходящий формат работы</p></div><div class="pg-b">`;
+  h+=`<div class="g3" style="margin-bottom:24px">`;
+  tariffs.forEach(t=>{
+    const perSession=t.sessions>0?Math.round(parseInt(t.price.replace(/\s/g,''))/t.sessions).toLocaleString('ru-RU'):'—';
+    h+=`<div class="tariff-card ${t.popular?'popular':''}">
+      <div class="tariff-name">${t.name}</div>
+      <div class="tariff-price">${t.price} ₽</div>
+      <div class="tariff-meta">${t.sessions>0?`${t.sessions} сессий по ${t.mins} мин · ${perSession} ₽/сессия`:'Формат спринта'}${t.note?`<br><span style="color:var(--gd)">${t.note}</span>`:''}</div>
+      <div class="tariff-desc">${t.desc}</div>
+      <button class="tariff-btn" onclick="orderTariff('${t.id}','${esc(t.name)}',${parseInt(t.price.replace(/\s/g,''))},${t.sessions},${t.mins},${t.installments})">Выбрать тариф</button>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  h+=`<div style="font-size:15px;font-weight:600;margin-bottom:12px">Дополнительные услуги</div>`;
+  h+=`<div class="g2" style="margin-bottom:24px">`;
+  extras.forEach(e=>{
+    h+=`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:18px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:4px">${e.name}</div>
+      <div style="font-family:var(--fm);font-size:16px;color:var(--gd);margin-bottom:8px">${e.price}</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6">${e.desc}</div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  // Order modal placeholder
+  h+=`<div id="orderModal"></div>`;
+  h+=`</div>`;
+  document.getElementById('p_tariffs').innerHTML=h;
+}
+
+function orderTariff(id,name,price,sessions,mins,maxInstall){
+  const modal=document.getElementById('orderModal');
+  let installOpts='<option value="1">Полная оплата</option>';
+  for(let i=2;i<=Math.max(maxInstall,1);i++) installOpts+=`<option value="${i}">Рассрочка на ${i} части</option>`;
+
+  modal.innerHTML=`
+  <div style="position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:500;display:flex;align-items:center;justify-content:center" onclick="if(event.target===this)this.remove()">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:28px;max-width:480px;width:90%" onclick="event.stopPropagation()">
+      <div style="font-family:var(--fd);font-size:20px;margin-bottom:4px">Заявка на тариф</div>
+      <div style="font-size:14px;color:var(--ac);font-weight:600;margin-bottom:16px">${name} — ${price.toLocaleString('ru-RU')} ₽</div>
+      ${sessions>0?`<div style="font-size:12px;color:var(--t3);margin-bottom:16px">${sessions} сессий по ${mins} мин</div>`:''}
+      <div style="margin-bottom:12px"><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Формат оплаты</div>
+        <select id="ord_install" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none" onchange="calcInstallment(${price},this.value)">${installOpts}</select></div>
+      <div id="ord_calc" style="margin-bottom:12px"></div>
+      <div style="margin-bottom:12px"><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Предпочтительный день оплаты</div>
+        <select id="ord_day" style="width:100%;padding:10px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:13px;outline:none">
+          <option>1-е число</option><option>5-е число</option><option>10-е число</option><option>15-е число</option><option>20-е число</option><option>25-е число</option></select></div>
+      <div style="margin-bottom:16px"><div style="font-size:10px;color:var(--t4);margin-bottom:4px">Комментарий</div>
+        <textarea id="ord_comment" class="jta" style="min-height:60px" placeholder="Дополнительные пожелания..."></textarea></div>
+      <button class="btn btn-a" style="width:100%" onclick="submitOrder('${id}','${name}',${price},${sessions},${mins})">Отправить заявку</button>
+    </div>
+  </div>`;
+  calcInstallment(price,1);
+}
+
+function calcInstallment(price,parts){
+  parts=parseInt(parts)||1;
+  const perPart=Math.ceil(price/parts);
+  const el=document.getElementById('ord_calc');
+  if(!el)return;
+  if(parts===1) el.innerHTML=`<div style="font-size:13px;color:var(--em)">Единоразовый платёж: <b>${price.toLocaleString('ru-RU')} ₽</b></div>`;
+  else{
+    let html=`<div style="font-size:13px;color:var(--gd);margin-bottom:6px">Рассрочка на ${parts} частей:</div>`;
+    for(let i=1;i<=parts;i++){
+      const isLast=i===parts;
+      const amt=isLast?price-perPart*(parts-1):perPart;
+      html+=`<div style="font-size:12px;color:var(--t2);padding:3px 0">Платёж ${i}: <b style="color:var(--ac)">${amt.toLocaleString('ru-RU')} ₽</b></div>`;
+    }
+    el.innerHTML=html;
+  }
+}
+
+function submitOrder(id,name,price,sessions,mins){
+  const install=document.getElementById('ord_install')?.value||'1';
+  const day=document.getElementById('ord_day')?.value||'1-е число';
+  const comment=document.getElementById('ord_comment')?.value||'';
+  // Save order to client data
+  if(!clientData.orders) clientData.orders=[];
+  clientData.orders.push({tariffId:id,name,price,sessions,mins,installments:install,payDay:day,comment,date:new Date().toISOString()});
+  save();
+  document.getElementById('orderModal').innerHTML='';
+  toast('Заявка отправлена! Анастасия свяжется с вами.');
+}
+
+// ===== THEME TOGGLE =====
+function toggleTheme(){
+  document.body.classList.toggle('light');
+  W('apex-theme',document.body.classList.contains('light')?'light':'dark');
+}
+// Restore theme on load
+if(S('apex-theme')==='light') document.body.classList.add('light');
+
+// ===== MOBILE MENU =====
+function openMobile(){
+  document.querySelector('.sidebar')?.classList.add('open');
+  document.getElementById('overlay')?.classList.add('show');
+}
+function closeMobile(){
+  document.querySelector('.sidebar')?.classList.remove('open');
+  document.getElementById('overlay')?.classList.remove('show');
+}
+
+function buildAdminUI(){
+  const sb=document.getElementById('sidebar');
+  sb.innerHTML=`
+  <div class="sidebar-top"><h1>A<span>P</span>EX</h1><button class="logout" onclick="logout()">✕</button></div>
+  <div class="sidebar-user"><div class="sidebar-avatar" style="background:var(--gd2);border-color:var(--gd);color:var(--gd)">К</div><div><div class="sidebar-uname">Коуч</div><div class="sidebar-urole">Администратор</div></div></div>
+  <div class="nav-sec">Управление</div>
+  <div class="nav-i active" data-p="adash" onclick="nav('adash')"><span class="ic">◉</span>Аналитика</div>
+  <div class="nav-i" data-p="aclients" onclick="nav('aclients')"><span class="ic">▣</span>Клиенты</div>
+  <div class="nav-i" data-p="aassign" onclick="nav('aassign')"><span class="ic">📋</span>Задания</div>
+  <div class="nav-i" data-p="aprog" onclick="nav('aprog')"><span class="ic">▣</span>Шаблон программы</div>
+  <div style="padding:14px 18px;border-top:1px solid var(--bd);margin-top:auto">
+    <button onclick="toggleTheme()" style="width:100%;padding:9px;border-radius:var(--r2);background:var(--bg3);border:1px solid var(--bd);color:var(--t2);font-family:var(--fb);font-size:12px;cursor:pointer">◐ Сменить тему</button>
+  </div>`;
+
+  document.getElementById('mainContent').innerHTML=`
+  <div class="pg active" id="p_adash"></div>
+  <div class="pg" id="p_aclients"></div>
+  <div class="pg" id="p_aassign"></div>
+  <div class="pg" id="p_aprog"></div>`;
+  renderAdminDash();renderAdminClients();renderAdminAssignments();renderAdminProg();
+}
+
+function renderAdminAssignments(){
+  const codes=S('clients-idx')||[];
+  let clientOpts=codes.map(code=>{const cl=S('cl:'+code);return cl?`<option value="${code}">${cl.name}</option>`:''}).join('');
+
+  document.getElementById('p_aassign').innerHTML=`
+  <div class="pg-h"><h2>Задания для клиентов</h2><p>Создавайте психологические задания и упражнения</p></div>
+  <div class="pg-b">
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:22px;margin-bottom:24px">
+      <div style="font-size:14px;font-weight:600;margin-bottom:14px">Создать новое задание</div>
+      <div class="irow"><input id="aa_title" placeholder="Название задания"><select id="aa_type" style="max-width:180px">
+        <option value="questions">С вопросами</option><option value="text">Свободный ответ</option></select></div>
+      <div style="margin-bottom:10px"><textarea class="jta" id="aa_desc" placeholder="Описание / инструкция для клиента..." style="min-height:70px"></textarea></div>
+      <div id="aa_questions_area">
+        <div style="font-size:11px;color:var(--t4);margin-bottom:6px">Вопросы (для типа «С вопросами»):</div>
+        <div id="aa_qlist"></div>
+        <button class="btn btn-g" style="margin-top:6px;font-size:11px" onclick="addAdminQ()">+ Добавить вопрос</button>
+      </div>
+      <div class="irow" style="margin-top:14px">
+        <select id="aa_client" style="max-width:200px"><option value="all">Всем клиентам</option>${clientOpts}</select>
+        <button class="btn btn-a" onclick="sendAssignment()">Отправить задание</button>
+      </div>
+    </div>
+    <div style="font-size:14px;font-weight:600;margin-bottom:10px">Отправленные задания</div>
+    <div id="aa_sent"></div>
+  </div>`;
+
+  // Init with one question field
+  addAdminQ();
+  renderSentAssignments();
+}
+
+function addAdminQ(){
+  const list=document.getElementById('aa_qlist');
+  if(!list)return;
+  const n=list.children.length+1;
+  const div=document.createElement('div');
+  div.className='irow';div.style.marginBottom='4px';
+  div.innerHTML=`<span style="font-family:var(--fm);font-size:11px;color:var(--t4);min-width:24px">${n}.</span><input placeholder="Вопрос ${n}..." class="aa-q-input">`;
+  list.appendChild(div);
+}
+
+function sendAssignment(){
+  const title=document.getElementById('aa_title').value.trim();
+  const desc=document.getElementById('aa_desc').value.trim();
+  const type=document.getElementById('aa_type').value;
+  const targetClient=document.getElementById('aa_client').value;
+  if(!title){toast('Введите название','rs');return}
+
+  const questions=[];
+  if(type==='questions'){
+    document.querySelectorAll('.aa-q-input').forEach((inp,i)=>{
+      const q=inp.value.trim();
+      if(q) questions.push({q, key:'custom_'+Date.now()+'_'+i});
+    });
+    if(questions.length===0){toast('Добавьте хотя бы 1 вопрос','rs');return}
+  }
+
+  const assignment={
+    id:'a_'+Date.now(), title, description:desc, type, questions,
+    fromCoach:true, createdAt:new Date().toISOString()
+  };
+
+  // Send to target client(s)
+  const codes=targetClient==='all'?(S('clients-idx')||[]):[targetClient];
+  codes.forEach(code=>{
+    const d=S('d:'+code)||defaultData();
+    if(!d.assignments) d.assignments=[];
+    d.assignments.push(assignment);
+    W('d:'+code,d);
+  });
+
+  // Save to admin sent log
+  const sent=S('admin-assignments')||[];
+  sent.unshift({...assignment, sentTo:targetClient==='all'?'Всем':S('cl:'+targetClient)?.name||targetClient, sentAt:new Date().toISOString()});
+  W('admin-assignments',sent);
+
+  document.getElementById('aa_title').value='';
+  document.getElementById('aa_desc').value='';
+  document.getElementById('aa_qlist').innerHTML='';
+  addAdminQ();
+  renderSentAssignments();
+  toast(`Задание отправлено ${codes.length} клиенту(ам)`);
+}
+
+function renderSentAssignments(){
+  const sent=S('admin-assignments')||[];
+  const el=document.getElementById('aa_sent');
+  if(!el)return;
+  el.innerHTML=sent.slice(0,20).map(a=>`
+    <div class="tk-i" style="margin-bottom:4px">
+      <span style="font-size:14px">📋</span>
+      <div style="flex:1"><div class="tk-t">${a.title}</div>
+        <div style="font-size:10px;color:var(--t4)">→ ${a.sentTo} · ${a.type==='questions'?a.questions.length+' вопросов':'Свободный ответ'}</div></div>
+      <span class="tk-m">${new Date(a.sentAt).toLocaleDateString('ru-RU')}</span>
+    </div>`).join('')||'<p style="color:var(--t4);font-size:12px">Пока нет отправленных заданий</p>';
+}
+
+async function renderAdminDash(){
+  const codes=S('clients-idx')||[];
+  let totalSess=0,totalDW=0,totalPrinc=0,totalJournal=0,activeCount=0;
+  const clientStats=[];
+  for(const code of codes){
+    const cl=S('cl:'+code);if(!cl)continue;
+    const d=S('d:'+code)||defaultData();
+    const cprog=d.clientProg||getProgram(code);
+    let total=0,done=0;cprog.forEach(ph=>ph.sessions.forEach(ss=>{total++;if(ss.done)done++}));
+    totalSess+=done;totalDW+=d.deepwork.minutes;totalPrinc+=d.principles.length;totalJournal+=d.journal.length;
+    if(cl.lastActive){const days=(Date.now()-new Date(cl.lastActive).getTime())/864e5;if(days<30)activeCount++}
+    clientStats.push({name:cl.name,code,done,total,pct:total?Math.round(done/total*100):0,
+      dw:d.deepwork.minutes,princ:d.principles.length,journal:d.journal.length,
+      lastActive:cl.lastActive?new Date(cl.lastActive).toLocaleDateString('ru-RU'):'—'});
+  }
+  document.getElementById('p_adash').innerHTML=`
+  <div class="pg-h"><h2>Аналитика</h2><p>Обзор всех клиентов</p></div>
+  <div class="pg-b">
+    <div class="g4">
+      <div class="cd ac"><div class="cd-t">Клиентов</div><div class="cd-v">${codes.length}</div><div class="cd-s">${activeCount} активных</div></div>
+      <div class="cd em"><div class="cd-t">Сессий пройдено</div><div class="cd-v">${totalSess}</div></div>
+      <div class="cd gd"><div class="cd-t">Deep Work (всего)</div><div class="cd-v">${totalDW}'</div></div>
+      <div class="cd bl"><div class="cd-t">Принципов</div><div class="cd-v">${totalPrinc}</div></div>
+    </div>
+    <h3 style="font-family:var(--fd);margin:28px 0 14px;font-size:17px">Прогресс клиентов</h3>
+    ${clientStats.map(c=>`
+      <div style="display:flex;align-items:center;gap:14px;margin-bottom:10px;padding:12px 16px;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r2)">
+        <div class="cl-av">${c.name[0].toUpperCase()}</div>
+        <div style="flex:1"><div style="font-size:13px;font-weight:600">${c.name}</div>
+          <div style="font-size:10px;color:var(--t4)">Сессии: ${c.done}/${c.total} · DW: ${c.dw}' · Принципы: ${c.princ} · Журнал: ${c.journal}</div></div>
+        <div style="width:120px"><div class="pr-tr"><div class="pr-f" style="width:${c.pct}%;background:var(--ac)"></div></div></div>
+        <span style="font-family:var(--fm);font-size:12px;color:var(--ac);min-width:36px;text-align:right">${c.pct}%</span>
+        <span style="font-size:10px;color:var(--t4)">${c.lastActive}</span>
+      </div>`).join('')||'<p style="color:var(--t4);font-size:13px">Нет клиентов</p>'}
+  </div>`;
+}
+
+function renderAdminClients(){
+  const codes=S('clients-idx')||[];
+  let rows='';
+  for(const code of codes){
+    const cl=S('cl:'+code);if(!cl)continue;
+    const d=S('d:'+code)||defaultData();
+    const cprog2=d.clientProg||getProgram(code);
+    let done2=0,total2=0;cprog2.forEach(ph=>ph.sessions.forEach(ss=>{total2++;if(ss.done)done2++}));
+    rows+=`<div class="cl-r">
+      <div class="cl-av">${cl.name[0].toUpperCase()}</div>
+      <div><div class="cl-n">${cl.name}</div><div class="cl-c">${code}</div></div>
+      <div class="cl-s">${done2}/${total2}</div>
+      <div class="cl-d">${cl.lastActive?new Date(cl.lastActive).toLocaleDateString('ru-RU'):'—'}</div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <input value="${code}" readonly onclick="this.select()" style="width:100px;padding:4px 8px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--ac);font-family:var(--fm);font-size:11px;text-align:center;outline:none;cursor:pointer">
+        <button class="cpb" onclick="cpLink('${code}')">📋</button>
+      </div>
+    </div>`;
+  }
+  document.getElementById('p_aclients').innerHTML=`
+  <div class="pg-h"><h2>Клиенты</h2><p>Создавайте клиентов и копируйте ссылки</p></div>
+  <div class="pg-b">
+    <div class="irow"><input id="nc" placeholder="Имя нового клиента"><button class="btn btn-a" onclick="createCl()">Создать</button></div>
+    ${rows||'<p style="color:var(--t4);font-size:13px">Нет клиентов</p>'}
+  </div>`;
+}
+
+function createCl(){
+  const name=document.getElementById('nc').value.trim();if(!name)return;
+  const code=name.toLowerCase().replace(/[^a-zа-яё0-9]/gi,'').slice(0,8)+Math.random().toString(36).slice(2,5);
+  W('cl:'+code,{name,createdAt:new Date().toISOString(),lastActive:null});
+  W('d:'+code,defaultData());
+  const idx=S('clients-idx')||[];idx.push(code);W('clients-idx',idx);
+  document.getElementById('nc').value='';
+  renderAdminClients();renderAdminDash();toast('Клиент создан: '+code)}
+
+function cpLink(code){
+  const link=location.origin+location.pathname+'#'+code;
+  // Try clipboard API first, then textarea fallback, then prompt
+  const fallback=()=>{
+    const ta=document.createElement('textarea');ta.value=code;ta.style.cssText='position:fixed;left:-9999px';
+    document.body.appendChild(ta);ta.select();
+    try{document.execCommand('copy');toast('Код скопирован: '+code);} catch(e){prompt('Код клиента (скопируйте вручную):',code)}
+    document.body.removeChild(ta);
+  };
+  try{navigator.clipboard.writeText(code).then(()=>toast('Код скопирован: '+code)).catch(fallback)}catch(e){fallback()}
+}
+
+// ===== SETTINGS =====
+function renderSettings(){
+  if(!clientData.settings) clientData.settings={gcalEnabled:false,tgBot:'',tgReminders:false};
+  const st=clientData.settings;
+  document.getElementById('p_settings').innerHTML=`
+  <div class="pg-h"><h2>Настройки</h2><p>Google Calendar, Telegram, импорт/экспорт данных</p></div>
+  <div class="pg-b">
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px;border-left:4px solid var(--bl)">
+      <div style="font-size:14px;font-weight:600;color:var(--bl);margin-bottom:10px">📅 Google Calendar</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">
+        Задачи из декомпозиции и спринтов можно синхронизировать с Google Calendar. Нажмите 📅 рядом с любой задачей — откроется Google Calendar с заполненным событием.
+      </div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">
+        Для автоматической синхронизации подключите Google Calendar API:
+      </div>
+      <div class="irow">
+        <input value="${esc(st.gcalId||'')}" placeholder="ID Google Calendar (email)..." style="flex:1" onchange="clientData.settings.gcalId=this.value;save()">
+      </div>
+      <div style="font-size:10px;color:var(--t4);margin-top:4px">Найдите ID в настройках Google Calendar → Настройки → ID календаря. Формат: email@gmail.com</div>
+      <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:var(--r3)">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px">Как подключить:</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.6">
+          1. Откройте <a href="https://calendar.google.com/calendar/r/settings" target="_blank" style="color:var(--bl)">настройки Google Calendar</a><br>
+          2. Выберите нужный календарь → скопируйте ID<br>
+          3. Вставьте выше<br>
+          4. Нажимайте 📅 у задач — они будут создаваться в вашем календаре
+        </div>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px;border-left:4px solid var(--bl)">
+      <div style="font-size:14px;font-weight:600;color:var(--bl);margin-bottom:10px">🤖 Telegram-напоминания</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">
+        Получайте напоминания о задачах в Telegram. Для подключения нужен Telegram-бот.
+      </div>
+      <div class="irow">
+        <input value="${esc(st.tgUsername||'')}" placeholder="Ваш @username в Telegram..." onchange="clientData.settings.tgUsername=this.value;save()">
+      </div>
+      <div style="margin-top:12px;padding:12px;background:var(--bg3);border-radius:var(--r3)">
+        <div style="font-size:11px;font-weight:600;color:var(--t2);margin-bottom:6px">Как подключить:</div>
+        <div style="font-size:11px;color:var(--t3);line-height:1.6">
+          1. Найдите бота <b>@APEX_CoachBot</b> в Telegram (или бота Анастасии)<br>
+          2. Отправьте /start<br>
+          3. Введите ваш код клиента<br>
+          4. Бот будет присылать напоминания о задачах из спринтов
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-top:12px">
+        <div style="width:40px;height:22px;border-radius:11px;background:${st.tgReminders?'var(--em)':'var(--bg3)'};border:2px solid ${st.tgReminders?'var(--em)':'var(--bd)'};cursor:pointer;position:relative;transition:all .2s" onclick="clientData.settings.tgReminders=!clientData.settings.tgReminders;save();renderSettings()">
+          <div style="width:16px;height:16px;border-radius:50%;background:var(--t1);position:absolute;top:1px;${st.tgReminders?'right:1px':'left:1px'};transition:all .2s"></div>
+        </div>
+        <span style="font-size:12px;color:var(--t2)">Ежедневные напоминания о задачах</span>
+      </div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;margin-bottom:16px;border-left:4px solid var(--em)">
+      <div style="font-size:14px;font-weight:600;color:var(--em);margin-bottom:10px">📥 Импорт данных из Excel</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">
+        Загрузите заполненный шаблон .xlsx — данные подтянутся в систему: видение, ценности, цели по сферам, декомпозиция.
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="btn btn-a" onclick="document.getElementById('xlsUpload').click()">📥 Загрузить .xlsx</button>
+        <button class="btn btn-g" onclick="exportData()">📤 Экспорт данных (JSON)</button>
+        <button class="btn btn-g" onclick="downloadTemplate()">📋 Скачать шаблон .xlsx</button>
+      </div>
+      <input type="file" id="xlsUpload" accept=".xlsx,.xls,.csv" style="display:none" onchange="importXLS(this.files[0])">
+      <div id="importStatus" style="margin-top:10px"></div>
+    </div>
+
+    <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:20px;border-left:4px solid var(--rs)">
+      <div style="font-size:14px;font-weight:600;color:var(--rs);margin-bottom:10px">⚠️ Данные</div>
+      <div style="font-size:12px;color:var(--t2);line-height:1.6;margin-bottom:12px">
+        Все данные хранятся в <b>облаке (Supabase)</b> и синхронизируются между всеми устройствами.
+        <br><br>Локальная копия хранится в браузере для быстрой загрузки. При очистке кэша данные будут автоматически восстановлены из облака при следующем входе.
+        <br><br><b>Рекомендация:</b> регулярно экспортируйте данные в JSON для резервной копии.
+      </div>
+      <button class="btn btn-g" style="border-color:var(--rs);color:var(--rs)" onclick="if(confirm('Вы уверены? Все данные будут удалены!')){localStorage.clear();location.reload()}">🗑 Очистить локальный кэш</button>
+    </div>
+
+  </div>`;
+}
+
+function exportData(){
+  const data=JSON.stringify(clientData,null,2);
+  const blob=new Blob([data],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='apex_data_'+currentCode+'_'+new Date().toISOString().slice(0,10)+'.json';
+  a.click();toast('Данные экспортированы');
+}
+
+function downloadTemplate(){
+  // Create a CSV template that user can fill in Excel
+  const lines=[
+    'Раздел,Поле,Значение',
+    'Видение,1 год,',
+    'Видение,3 года,',
+    'Видение,5 лет,',
+    'Видение,10 лет,',
+    ...clientData.values.map((_,i)=>`Ценности,Ценность ${i+1},`),
+    ...clientData.spheres.map(s=>`Сфера,${s.name},Цель на год: `),
+  ];
+  clientData.spheres.forEach(s=>{
+    ['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'].forEach(m=>{
+      lines.push(`Декомпозиция ${s.name},${m},`);
+    });
+  });
+  const blob=new Blob(['\ufeff'+lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='apex_template.csv';a.click();
+  toast('Шаблон скачан (CSV — откройте в Excel)');
+}
+
+async function importXLS(file){
+  if(!file)return;
+  const status=document.getElementById('importStatus');
+  status.innerHTML='<div style="color:var(--gd);font-size:12px">⏳ Загрузка...</div>';
+
+  try{
+    const text=await file.text();
+    const lines=text.split('\n').map(l=>l.split(',').map(c=>c.trim().replace(/^"|"$/g,'')));
+
+    let imported=0;
+    lines.forEach(cols=>{
+      if(cols.length<3||!cols[2])return;
+      const section=cols[0],field=cols[1],value=cols[2];
+
+      if(section==='Видение'){
+        if(field.includes('1 год')){clientData.vision.y1=value;imported++}
+        if(field.includes('3 года')){clientData.vision.y3=value;imported++}
+        if(field.includes('5 лет')){clientData.vision.y5=value;imported++}
+        if(field.includes('10 лет')){clientData.vision.y10=value;imported++}
+      }
+      if(section==='Ценности'){
+        const idx=parseInt(field.replace(/\D/g,''))-1;
+        if(idx>=0&&idx<clientData.values.length){clientData.values[idx]=value;imported++}
+        else{clientData.values.push(value);imported++}
+      }
+      if(section==='Сфера'){
+        const sph=clientData.spheres.find(s=>s.name===field);
+        if(sph&&value.startsWith('Цель на год:')){sph.yearGoal=value.replace('Цель на год:','').trim();imported++}
+      }
+      if(section.startsWith('Декомпозиция ')){
+        const sphName=section.replace('Декомпозиция ','');
+        const sph=clientData.spheres.find(s=>s.name===sphName);
+        const mIdx=['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек'].indexOf(field);
+        if(sph&&mIdx>=0){sph.monthGoals[mIdx]=value;imported++}
+      }
+    });
+
+    save();
+    status.innerHTML=`<div style="color:var(--em);font-size:12px">✓ Импортировано ${imported} полей. Обновите страницу для отображения.</div>`;
+    toast(`Импортировано ${imported} полей`);
+  }catch(e){
+    status.innerHTML=`<div style="color:var(--rs);font-size:12px">✗ Ошибка: ${e.message}</div>`;
+  }
+}
+
+// ===== ADMIN PROGRAM TEMPLATE EDITOR =====
+function renderAdminProg(){
+  const template=S('prog-template')||defaultProgram;
+  const codes=S('clients-idx')||[];
+
+  let h=`<div class="pg-h"><h2>Шаблон программы сессий</h2><p>Редактируйте темы по умолчанию. Изменения применяются к новым клиентам.</p></div><div class="pg-b">`;
+
+  h+=`<div style="display:flex;gap:8px;margin-bottom:20px">
+    <button class="btn btn-a" onclick="saveProgTemplate()">💾 Сохранить шаблон</button>
+    <button class="btn btn-g" onclick="if(confirm('Сбросить к оригиналу?')){W('prog-template',null);renderAdminProg();toast('Сброшено')}">↺ Сбросить</button>
+    <select id="applyProgClient" style="padding:8px 12px;background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r3);color:var(--t1);font-family:var(--fb);font-size:12px;outline:none">
+      <option value="">Применить к клиенту...</option>
+      ${codes.map(c=>{const cl=S('cl:'+c);return cl?`<option value="${c}">${cl.name}</option>`:''}).join('')}
+      <option value="__all__">Всем клиентам</option>
+    </select>
+    <button class="btn btn-g" onclick="applyProgToClient()">Применить</button>
+  </div>`;
+
+  template.forEach((ph,pi)=>{
+    h+=`<div style="font-family:var(--fd);font-size:16px;color:var(--gd);margin:20px 0 10px;display:flex;align-items:center;gap:8px">
+      <input value="${esc(ph.phase)}" style="background:transparent;border:none;color:var(--gd);font-family:var(--fd);font-size:16px;font-weight:500;outline:none" onchange="adminProgEdit(${pi},'phase',this.value)">
+      <span style="font-family:var(--fm);font-size:10px;color:var(--t4);background:var(--bg3);padding:2px 8px;border-radius:99px">${ph.sessions.length}</span>
+    </div>`;
+
+    ph.sessions.forEach((s,si)=>{
+      h+=`<div class="tk-i" style="gap:6px">
+        <span style="font-family:var(--fm);font-size:10px;color:var(--t4);min-width:28px;text-align:center">${s.n}</span>
+        <input value="${esc(s.t)}" placeholder="Тема сессии..." style="flex:2;background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);padding:6px 8px;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none" onchange="adminProgEdit(${pi},'t',this.value,${si})">
+        <input value="${esc(s.c||'')}" placeholder="Комментарий..." style="flex:1;background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);padding:6px 8px;color:var(--t3);font-family:var(--fb);font-size:11px;outline:none" onchange="adminProgEdit(${pi},'c',this.value,${si})">
+        <input value="${esc(s.hw||'')}" placeholder="ДЗ..." style="flex:1;background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);padding:6px 8px;color:var(--bl);font-family:var(--fb);font-size:11px;outline:none" onchange="adminProgEdit(${pi},'hw',this.value,${si})">
+        <button class="tk-x" onclick="adminProgDel(${pi},${si})">×</button>
+      </div>`;
+    });
+
+    h+=`<button class="btn btn-g" style="margin:6px 0 0;font-size:10px" onclick="adminProgAdd(${pi})">+ Добавить сессию</button>`;
+  });
+
+  h+=`<button class="btn btn-g" style="margin:20px 0;font-size:12px" onclick="adminProgAddPhase()">+ Добавить фазу</button>`;
+  h+=`</div>`;
+  document.getElementById('p_aprog').innerHTML=h;
+}
+
+function getAdminTemplate(){return S('prog-template')||JSON.parse(JSON.stringify(defaultProgram))}
+
+function adminProgEdit(pi,field,value,si){
+  const t=getAdminTemplate();
+  if(field==='phase') t[pi].phase=value;
+  else t[pi].sessions[si][field]=value;
+  W('prog-template',t);
+}
+
+function adminProgDel(pi,si){
+  const t=getAdminTemplate();
+  t[pi].sessions.splice(si,1);
+  W('prog-template',t);
+  renderAdminProg();
+}
+
+function adminProgAdd(pi){
+  const t=getAdminTemplate();
+  const lastN=t[pi].sessions.length>0?t[pi].sessions[t[pi].sessions.length-1].n:0;
+  t[pi].sessions.push({n:lastN+1,t:'',c:'',hw:''});
+  W('prog-template',t);
+  renderAdminProg();
+}
+
+function adminProgAddPhase(){
+  const t=getAdminTemplate();
+  const name=prompt('Название новой фазы:');
+  if(!name)return;
+  t.push({phase:name,sessions:[{n:1,t:'',c:'',hw:''}]});
+  W('prog-template',t);
+  renderAdminProg();
+}
+
+function saveProgTemplate(){
+  const t=getAdminTemplate();
+  W('prog-template',t);
+  toast('Шаблон сохранён');
+}
+
+function applyProgToClient(){
+  const sel=document.getElementById('applyProgClient');
+  const val=sel?.value;if(!val)return;
+  const t=getAdminTemplate();
+  if(val==='__all__'){
+    const codes=S('clients-idx')||[];
+    codes.forEach(c=>W('prog:'+c,JSON.parse(JSON.stringify(t))));
+    toast(`Применено к ${codes.length} клиентам`);
+  } else {
+    W('prog:'+val,JSON.parse(JSON.stringify(t)));
+    const cl=S('cl:'+val);
+    toast(`Применено к ${cl?.name||val}`);
+  }
+}
+
+// Auto-login handled in async init above
+</script>
+</body>
+</html>
