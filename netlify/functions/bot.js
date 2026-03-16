@@ -3,7 +3,7 @@ const https = require('https');
 const CONFIG = {
   BOT_TOKEN : process.env.TELEGRAM_BOT_TOKEN,
   SUPABASE_URL: 'https://mzikjfwohagyowfqdwsx.supabase.co',
-  SUPABASE_KEY: 'sb_publishable_0a0lCROfppd1yu9XvQJgFQ_an9KOlx7',
+  SUPABASE_KEY: process.env.SUPABASE_KEY,
   COACH_TELEGRAM_ID: '169051508'
 };
 
