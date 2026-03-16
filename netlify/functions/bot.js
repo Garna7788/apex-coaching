@@ -1,7 +1,7 @@
 const https = require('https');
 
 const CONFIG = {
-  BOT_TOKEN: '8723103709:AAGmXClsBlHfaj4gSMxqj3-x5ByEYkdZsk0',
+  BOT_TOKEN : process.env.TELEGRAM_BOT_TOKEN,
   SUPABASE_URL: 'https://mzikjfwohagyowfqdwsx.supabase.co',
   SUPABASE_KEY: 'sb_publishable_0a0lCROfppd1yu9XvQJgFQ_an9KOlx7',
   COACH_TELEGRAM_ID: '169051508'
