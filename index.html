@@ -1685,7 +1685,11 @@ function buildAdminUI(){
   <div class="pg" id="p_aclients"></div>
   <div class="pg" id="p_aassign"></div>
   <div class="pg" id="p_aprog"></div>`;
-  renderAdminDash();renderAdminClients();renderAdminAssignments();renderAdminProg();
+
+  // Wait for Supabase data then render
+  loadAllFromSupabase().then(()=>{
+    renderAdminDash();renderAdminClients();renderAdminAssignments();renderAdminProg();
+  });
 }
 
 function renderAdminAssignments(){
