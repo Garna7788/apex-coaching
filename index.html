@@ -1538,13 +1538,13 @@ function renderFinance(){
 function addFinSession(){
   if(!clientData.finance.sessions) clientData.finance.sessions=[];
   clientData.finance.sessions.push({date:'',time:'',minutes:'',recordLink:''});
-  saveFin();
+  saveFin();renderFinance();
 }
 
 function addFinPayment(){
   if(!clientData.finance.payments) clientData.finance.payments=[];
   clientData.finance.payments.push({date:'',amount:'',comment:''});
-  saveFin();
+  saveFin();renderFinance();
 }
 
 // ===== TARIFFS =====
