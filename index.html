@@ -813,7 +813,7 @@ function renderVision(){
 }
 
 // ===== DECOMPOSITION =====
-function renderDecomp(){
+function renderDecomp(){   // Sync spheres from values block   const filledValues = clientData.values.filter(v => v && v.trim());   if(filledValues.length > 0){     filledValues.forEach((val, i) => {       const name = val.trim();       if(i < clientData.spheres.length){         clientData.spheres[i].name = name;       } else {         clientData.spheres.push({           name, yearGoal:'', monthGoals:Array(12).fill(''),           tasks:Array(12).fill(null).map(()=>[[],[],[],[]])         });       }     });     if(clientData.spheres.length > filledValues.length){       clientData.spheres.splice(filledValues.length);     }   }
   // Migrate old data format if needed
   clientData.spheres.forEach((s,i)=>{
     if(!s.yearGoal && s.yearGoal!=='') s.yearGoal=s.action||'';
