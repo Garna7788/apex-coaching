@@ -411,13 +411,14 @@ let mode='',currentCode='',clientInfo=null,clientData=null,saveT=null,timerInt=n
 const defaultData=()=>({
   completed:[],vision:{y1:'',y3:'',y5:'',y10:''},friends:['','','','',''],values:['','',''],
   spheres:['Карьера / Статус','Финансы / Доход','Здоровье / Энергия','Отношения / Семья','Развитие / Образование','Отдых / Хобби','Вклад / Влияние','Окружение / Нетворк'].map(n=>({
-    name:n, yearGoal:'', monthGoals:Array(12).fill(''),
+    name:n, yearGoal:'', vision10:'', monthGoals:Array(12).fill(''),
     tasks:Array(12).fill(null).map(()=>[[],[],[],[]])
   })),
   health:Array(12).fill(null),beliefs:{want:'',benefits:'',limiting:''},pleasantville:{q1:'',q2:'',q3:'',main:''},
   timeblocks:[],deepwork:{sessions:0,minutes:0,streak:0,lastDate:''},journal:[],painlog:[],principles:[],
   priorities:['','','','',''],decisions:{type1:[],type2:[]},
   assignments:[],
+  media:{videos:[],books:[]},
   finance:{tariff:'',totalSessions:0,totalPrice:0,sessions:[],payments:[]}
 });
 
@@ -602,6 +603,7 @@ function buildClientUI(){
   <div class="nav-i" data-p="assignments" onclick="nav('assignments')"><span class="ic">📋</span>Задания от Анастасии</div>
   <div class="nav-i" data-p="finance" onclick="nav('finance')"><span class="ic">💳</span>Сессии и оплаты</div>
   <div class="nav-i" data-p="tariffs" onclick="nav('tariffs')"><span class="ic">🥥</span>Тарифы</div>
+  <div class="nav-i" data-p="media" onclick="nav('media')"><span class="ic">🎬</span>Книги и фильмы</div>
   <div class="nav-sec">Настройки</div>
   <div class="nav-i" data-p="settings" onclick="nav('settings')"><span class="ic">⚙</span>Настройки</div>
   <div style="padding:14px 18px;border-top:1px solid var(--bd);margin-top:auto">
@@ -627,11 +629,12 @@ function buildClientUI(){
   <div class="pg" id="p_assignments"></div>
   <div class="pg" id="p_finance"></div>
   <div class="pg" id="p_tariffs"></div>
+  <div class="pg" id="p_media"></div>
   <div class="pg" id="p_settings"></div>`;
   renderClient();
 }
 
-function renderClient(){renderDash();renderProg();renderVision();renderDecomp();renderBacklog();renderValues();renderTB();renderDW();renderJournal();renderPain();renderPrinc();renderPrior();renderHealth();renderBeliefs();renderAssignments();renderFinance();renderTariffs();renderSettings()}
+function renderClient(){renderDash();renderProg();renderVision();renderDecomp();renderBacklog();renderValues();renderTB();renderDW();renderJournal();renderPain();renderPrinc();renderPrior();renderHealth();renderBeliefs();renderAssignments();renderFinance();renderTariffs();renderMedia();renderSettings()}
 
 // ===== DASHBOARD =====
 function renderDash(){
@@ -813,7 +816,25 @@ function renderVision(){
 }
 
 // ===== DECOMPOSITION =====
-function renderDecomp(){   // Sync spheres from values block   const filledValues = clientData.values.filter(v => v && v.trim());   if(filledValues.length > 0){     filledValues.forEach((val, i) => {       const name = val.trim();       if(i < clientData.spheres.length){         clientData.spheres[i].name = name;       } else {         clientData.spheres.push({           name, yearGoal:'', monthGoals:Array(12).fill(''),           tasks:Array(12).fill(null).map(()=>[[],[],[],[]])         });       }     });     if(clientData.spheres.length > filledValues.length){       clientData.spheres.splice(filledValues.length);     }   }
+function renderDecomp(){
+  // Sync spheres from values block
+  const filledValues = clientData.values.filter(v => v && v.trim());
+  if(filledValues.length > 0){
+    filledValues.forEach((val, i) => {
+      const name = val.trim();
+      if(i < clientData.spheres.length){
+        clientData.spheres[i].name = name;
+      } else {
+        clientData.spheres.push({
+          name, yearGoal:'', monthGoals:Array(12).fill(''),
+          tasks:Array(12).fill(null).map(()=>[[],[],[],[]])
+        });
+      }
+    });
+    if(clientData.spheres.length > filledValues.length){
+      clientData.spheres.splice(filledValues.length);
+    }
+  }
   // Migrate old data format if needed
   clientData.spheres.forEach((s,i)=>{
     if(!s.yearGoal && s.yearGoal!=='') s.yearGoal=s.action||'';
@@ -843,6 +864,11 @@ function renderDecomp(){   // Sync spheres from values block   const filledValue
     h+=`<div class="dec-year-row">
       <label>🎯 Цель на год</label>
       <input value="${esc(sph.yearGoal)}" placeholder="Например: выйти на доход 5000€/мес" oninput="clientData.spheres[${si}].yearGoal=this.value;save()">
+    </div>`;
+    // 10-year vision row
+    h+=`<div class="dec-year-row" style="background:var(--bg2)">
+      <label style="color:var(--gd)">🔭 К цели на 10 лет</label>
+      <input value="${esc(sph.vision10||'')}" placeholder="Как эта годовая цель ведёт к вашему 10-летнему видению?" style="color:var(--gd)" oninput="clientData.spheres[${si}].vision10=this.value;save()">
     </div>`;
 
     // Months scroll
@@ -1842,6 +1868,147 @@ function cpLink(code){
     document.body.removeChild(ta);
   };
   try{navigator.clipboard.writeText(code).then(()=>toast('Код скопирован: '+code)).catch(fallback)}catch(e){fallback()}
+}
+
+// ===== MEDIA (Books & Films) =====
+function renderMedia(){
+  if(!clientData.media) clientData.media={videos:[],books:[]};
+  const m=clientData.media;
+
+  function ytId(url){
+    const r=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+    return r?r[1]:null;
+  }
+
+  let h=`<div class="pg-h"><h2>Книги и фильмы</h2><p>Материалы для вашего развития от коуча и личные находки</p></div><div class="pg-b">`;
+
+  // VIDEOS section
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="font-family:var(--fd);font-size:17px">🎬 Видео и фильмы</h3>
+    <button class="btn btn-a" onclick="addMedia('video')">+ Добавить</button>
+  </div>`;
+
+  h+=`<div id="mediaVideoAdd" style="display:none;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:14px">
+    <div class="irow">
+      <input id="mv_url" placeholder="Ссылка на YouTube (https://youtube.com/watch?v=...)" oninput="previewYT(this.value)">
+    </div>
+    <div id="mv_preview" style="margin-bottom:10px"></div>
+    <div class="irow">
+      <input id="mv_title" placeholder="Название (необязательно — подтянется автоматически)">
+      <input id="mv_comment" placeholder="Комментарий...">
+      <button class="btn btn-a" onclick="saveMedia('video')">Сохранить</button>
+      <button class="btn btn-g" onclick="document.getElementById('mediaVideoAdd').style.display='none'">Отмена</button>
+    </div>
+  </div>`;
+
+  if(m.videos.length===0){
+    h+=`<p style="color:var(--t4);font-size:12px;margin-bottom:24px">Пока нет видео. Добавьте ссылку на YouTube.</p>`;
+  } else {
+    h+=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-bottom:28px">`;
+    m.videos.forEach((v,i)=>{
+      const id=ytId(v.url);
+      h+=`<div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden">`;
+      if(id){
+        h+=`<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden">
+          <iframe src="https://www.youtube.com/embed/${id}" style="position:absolute;top:0;left:0;width:100%;height:100%;border:none" allowfullscreen loading="lazy"></iframe>
+        </div>`;
+      }
+      h+=`<div style="padding:12px">
+        <div style="font-size:13px;font-weight:600;margin-bottom:4px">${esc(v.title||'Видео')}</div>
+        ${v.comment?`<div style="font-size:11px;color:var(--t3);margin-bottom:8px">${esc(v.comment)}</div>`:''}
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <a href="${esc(v.url)}" target="_blank" style="font-size:10px;color:var(--bl);text-decoration:underline">Открыть в YouTube</a>
+          <button class="tk-x" onclick="clientData.media.videos.splice(${i},1);save();renderMedia()">×</button>
+        </div>
+      </div></div>`;
+    });
+    h+=`</div>`;
+  }
+
+  // BOOKS section
+  h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+    <h3 style="font-family:var(--fd);font-size:17px">📚 Книги</h3>
+    <button class="btn btn-a" onclick="addMedia('book')">+ Добавить</button>
+  </div>`;
+
+  h+=`<div id="mediaBookAdd" style="display:none;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:16px;margin-bottom:14px">
+    <div class="irow">
+      <input id="mb_url" placeholder="Ссылка на Яндекс Книги / Litres / любой источник">
+      <input id="mb_title" placeholder="Название книги">
+      <input id="mb_author" placeholder="Автор">
+    </div>
+    <div class="irow">
+      <input id="mb_comment" placeholder="Комментарий или заметка...">
+      <button class="btn btn-a" onclick="saveMedia('book')">Сохранить</button>
+      <button class="btn btn-g" onclick="document.getElementById('mediaBookAdd').style.display='none'">Отмена</button>
+    </div>
+  </div>`;
+
+  if(m.books.length===0){
+    h+=`<p style="color:var(--t4);font-size:12px">Пока нет книг. Добавьте ссылку из Яндекс Книг или другого источника.</p>`;
+  } else {
+    h+=`<div class="tk">`;
+    m.books.forEach((b,i)=>{
+      h+=`<div class="tk-i">
+        <span style="font-size:18px">📖</span>
+        <div style="flex:1">
+          <div style="font-size:13px;font-weight:600">${esc(b.title||'Книга')}</div>
+          ${b.author?`<div style="font-size:11px;color:var(--t4)">${esc(b.author)}</div>`:''}
+          ${b.comment?`<div style="font-size:11px;color:var(--t3);margin-top:2px">${esc(b.comment)}</div>`:''}
+        </div>
+        ${b.url?`<a href="${esc(b.url)}" target="_blank" style="font-size:11px;color:var(--bl);text-decoration:underline;white-space:nowrap">Открыть →</a>`:''}
+        <button class="tk-x" onclick="clientData.media.books.splice(${i},1);save();renderMedia()">×</button>
+      </div>`;
+    });
+    h+=`</div>`;
+  }
+
+  h+=`</div>`;
+  document.getElementById('p_media').innerHTML=h;
+}
+
+function addMedia(type){
+  document.getElementById('mediaVideoAdd').style.display=type==='video'?'block':'none';
+  document.getElementById('mediaBookAdd').style.display=type==='book'?'block':'none';
+}
+
+function previewYT(url){
+  const r=url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{11})/);
+  const el=document.getElementById('mv_preview');
+  if(!el)return;
+  if(r){
+    el.innerHTML=`<img src="https://img.youtube.com/vi/${r[1]}/mqdefault.jpg" style="width:100%;max-width:320px;border-radius:var(--r2);margin-top:6px">`;
+  } else {
+    el.innerHTML='';
+  }
+}
+
+function saveMedia(type){
+  if(!clientData.media) clientData.media={videos:[],books:[]};
+  if(type==='video'){
+    const url=document.getElementById('mv_url').value.trim();
+    if(!url){toast('Введите ссылку','rs');return}
+    const title=document.getElementById('mv_title').value.trim();
+    const comment=document.getElementById('mv_comment').value.trim();
+    clientData.media.videos.push({url,title:title||'Видео',comment});
+    document.getElementById('mv_url').value='';
+    document.getElementById('mv_title').value='';
+    document.getElementById('mv_comment').value='';
+    document.getElementById('mediaVideoAdd').style.display='none';
+  } else {
+    const url=document.getElementById('mb_url').value.trim();
+    const title=document.getElementById('mb_title').value.trim();
+    const author=document.getElementById('mb_author').value.trim();
+    const comment=document.getElementById('mb_comment').value.trim();
+    if(!title&&!url){toast('Введите название или ссылку','rs');return}
+    clientData.media.books.push({url,title:title||'Книга',author,comment});
+    document.getElementById('mb_url').value='';
+    document.getElementById('mb_title').value='';
+    document.getElementById('mb_author').value='';
+    document.getElementById('mb_comment').value='';
+    document.getElementById('mediaBookAdd').style.display='none';
+  }
+  save();renderMedia();toast('Сохранено');
 }
 
 // ===== SETTINGS =====
