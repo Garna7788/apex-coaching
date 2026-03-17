@@ -1479,12 +1479,12 @@ function renderFinance(){
       <td style="padding:8px 12px;color:var(--t4);font-family:var(--fm)">${i+1}</td>
       <td style="padding:8px 12px"><input type="date" value="${se.date||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none" onchange="clientData.finance.sessions[${i}].date=this.value;save()"></td>
       <td style="padding:8px 12px"><input type="time" value="${se.time||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none;width:80px" onchange="clientData.finance.sessions[${i}].time=this.value;save()"></td>
-      <td style="padding:8px 12px"><input type="number" value="${se.minutes||''}" placeholder="60" min="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--gd);font-family:var(--fm);font-size:12px;outline:none;width:60px;padding:3px 6px;text-align:center" oninput="clientData.finance.sessions[${i}].minutes=this.value;saveFin()"></td>
+      <td style="padding:8px 12px"><input type="number" value="${se.minutes||''}" placeholder="60" min="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--gd);font-family:var(--fm);font-size:12px;outline:none;width:60px;padding:3px 6px;text-align:center" oninput="clientData.finance.sessions[${i}].minutes=this.value;saveFin();renderFinance()"></td>
       <td style="padding:8px 12px;font-family:var(--fm);color:var(--t2)">${cost.toLocaleString('ru-RU')} ₽</td>
       <td style="padding:8px 12px;font-family:var(--fm);color:${runningMinutes<0?'var(--rs)':'var(--em)'}">${runningMinutes}</td>
       <td style="padding:8px 12px;font-family:var(--fm);color:${runningMoney<0?'var(--rs)':'var(--em)'}">${Math.round(runningMoney).toLocaleString('ru-RU')}</td>
       <td style="padding:8px 12px"><input value="${esc(se.recordLink||'')}" placeholder="Ссылка на запись..." style="background:transparent;border:none;color:var(--bl);font-size:11px;outline:none;width:120px;text-decoration:underline" oninput="clientData.finance.sessions[${i}].recordLink=this.value;save()"></td>
-      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.sessions.splice(${i},1);saveFin()">×</button></td>
+      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.sessions.splice(${i},1);saveFin();renderFinance()">×</button></td>
     </tr>`;
   });
 
@@ -1515,11 +1515,11 @@ function renderFinance(){
     h+=`<tr style="background:var(--bg2)">
       <td style="padding:8px 12px;color:var(--t4);font-family:var(--fm)">${i+1}</td>
       <td style="padding:8px 12px"><input type="date" value="${p.date||''}" style="background:transparent;border:none;color:var(--t1);font-family:var(--fb);font-size:12px;outline:none" onchange="clientData.finance.payments[${i}].date=this.value;save()"></td>
-      <td style="padding:8px 12px"><input type="number" value="${p.amount||''}" placeholder="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--em);font-family:var(--fm);font-size:12px;outline:none;width:100px;padding:3px 6px;text-align:center" oninput="clientData.finance.payments[${i}].amount=this.value;saveFin()"> ₽</td>
+      <td style="padding:8px 12px"><input type="number" value="${p.amount||''}" placeholder="0" style="background:transparent;border:1px dashed var(--bd);border-radius:var(--r3);color:var(--em);font-family:var(--fm);font-size:12px;outline:none;width:100px;padding:3px 6px;text-align:center" oninput="clientData.finance.payments[${i}].amount=this.value;saveFin();renderFinance()"> ₽</td>
       <td style="padding:8px 12px"><input value="${esc(p.comment||'')}" placeholder="Комментарий..." style="background:transparent;border:none;color:var(--t2);font-size:12px;outline:none;width:150px" oninput="clientData.finance.payments[${i}].comment=this.value;save()"></td>
       <td style="padding:8px 12px;font-family:var(--fm);color:var(--em)">${runningPaid.toLocaleString('ru-RU')} ₽</td>
       <td style="padding:8px 12px;font-family:var(--fm);color:${remainingDebt>0?'var(--rs)':'var(--em)'}">${remainingDebt>0?remainingDebt.toLocaleString('ru-RU')+' ₽':'Оплачено ✓'}</td>
-      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.payments.splice(${i},1);saveFin()">×</button></td>
+      <td style="padding:8px 8px"><button class="tk-x" onclick="clientData.finance.payments.splice(${i},1);saveFin();renderFinance()">×</button></td>
     </tr>`;
   });
   h+=`</tbody></table></div>`;
